@@ -1,0 +1,130 @@
+import React, { useState } from "react";
+import { assets } from "../assets/assets";
+import { Star } from "lucide-react";
+
+const Login = () => {
+  const [showLoginForm, setShowLoginForm] = useState(true);
+  const handleSubmit = () => {
+
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col md:flex-row">
+      {/* Background Image */}
+      <img
+        src={assets.bgImage}
+        className="absolute top-0 left-0 -z-1 w-full h-full object-cover"
+      />
+
+      {/* Left Side : Branding */}
+      <div className="flex-1 flex flex-col items-start justify-between p-6 md:p-10 lg:pl-40 ">
+        <img src={assets.logo} className="h-12 object-contain" />
+        <div>
+          <div className="flex items-center gap-3 mb-4 max-md:mt-10">
+            <img src={assets.group_users} className="h-8 md:h-10" />
+            <div>
+              <div className="flex">
+                {Array(5)
+                  .fill(0)
+                  .map((_, i) => (
+                    <Star
+                      key={i}
+                      className="size-4 md:size-4.5 text-transparent fill-amber-500"
+                    />
+                  ))}
+              </div>
+              <p>Used by 1,000+ developers</p>
+            </div>
+          </div>
+          <h1 className="text-3xl md:text-6xl md:pb-2 font-bold bg-linear-to-r from-indigo-950 to-indigo-800 bg-clip-text text-transparent">
+            More than just friends truly connect
+          </h1>
+          <p className="text-xl md:text-3xl text-indigo-900 max-w-72 md:max-w-md">
+            connect with global community on MyCircle
+          </p>
+        </div>
+        <span className="md:h-10"></span>
+      </div>
+
+      {/* Right side: Login or Signup form */}
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-10">
+        <div className="flex flex-col bg-slate-100 rounded-2xl shadow-lg p-8 w-full max-w-sm gap-2">
+          <h2 className="text-2xl font-bold text-slate-800 mb-4 text-center">
+            {showLoginForm ? "Login" : "Signup"}
+          </h2>
+
+          {!showLoginForm && (
+            <>
+              <label className="text-sm font-medium text-slate-600">
+                First name
+              </label>
+              <input
+                type="text"
+                placeholder="Enter first name"
+                className="border border-slate-300 rounded-lg px-4 py-2.5 text-md text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition mb-2"
+              />
+            </>
+          )}
+
+          {!showLoginForm && (
+            <>
+              <label className="text-sm font-medium text-slate-600">
+                Last name
+              </label>
+              <input
+                type="text"
+                placeholder="Enter last name"
+                className="border border-slate-300 rounded-lg px-4 py-2.5 text-md text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition mb-2"
+              />
+            </>
+          )}
+
+          <label className="text-sm font-medium text-slate-600">Email</label>
+          <input
+            type="email"
+            placeholder="Enter email"
+            className="border border-slate-300 rounded-lg px-4 py-2.5 text-md text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition mb-2"
+          />
+
+          <label className="text-sm font-medium text-slate-600">Password</label>
+          <input
+            type="password"
+            placeholder="Enter password"
+            className="border border-slate-300 rounded-lg px-4 py-2.5 text-md text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition mb-4"
+          />
+
+          <button
+            className="bg-gray-700 hover:bg-gray-600 active:scale-95 text-white font-semibold py-2.5 rounded-lg transition-all duration-200 shadow-md"
+            onClick={handleSubmit}
+          >
+            {showLoginForm ? "Login" : "Signup"}
+          </button>
+
+          {showLoginForm ? (
+            <p>
+              Don't have an account ?{" "}
+              <span
+                className="text-blue-500 border-b font-bold"
+                onClick={() => setShowLoginForm(!showLoginForm)}
+              >
+                Signup{" "}
+              </span>
+            </p>
+          ) : (
+            <p>
+              Already have an account ?{" "}
+              <span
+                className="text-blue-500 border-b font-bold"
+                onClick={() => setShowLoginForm(!showLoginForm)}
+              >
+                login{" "}
+              </span>
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
