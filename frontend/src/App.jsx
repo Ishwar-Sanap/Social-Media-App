@@ -9,12 +9,14 @@ import Discover from "./pages/Discover";
 import Profile from "./pages/Profile";
 import CreatePost from "./pages/CreatePost";
 import Layout from "./pages/Layout";
+import {Toaster} from "react-hot-toast"
 
 const App = () => {
   //User login details will be there in store when logged in
-  const user = false;
+  const user = true;
   return (
     <>
+      <Toaster/>
       <Routes>
         <Route path="/" element={user ? <Layout /> : <Login />}>
           <Route index element={<Feed />} />

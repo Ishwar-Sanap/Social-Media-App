@@ -4,9 +4,7 @@ import { Star } from "lucide-react";
 
 const Login = () => {
   const [showLoginForm, setShowLoginForm] = useState(true);
-  const handleSubmit = () => {
-
-  };
+  const handleSubmit = () => {};
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
@@ -94,7 +92,7 @@ const Login = () => {
           />
 
           <button
-            className="bg-gray-700 hover:bg-gray-600 active:scale-95 text-white font-semibold py-2.5 rounded-lg transition-all duration-200 shadow-md"
+            className="py-2.5 rounded-lg bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indio-700 hover:to-indigo-800 active:scale-95 transition text-white cursor-pointer shadow-md"
             onClick={handleSubmit}
           >
             {showLoginForm ? "Login" : "Signup"}
@@ -104,7 +102,7 @@ const Login = () => {
             <p>
               Don't have an account ?{" "}
               <span
-                className="text-blue-500 border-b font-bold"
+                className="text-indigo-500 border-b font-bold"
                 onClick={() => setShowLoginForm(!showLoginForm)}
               >
                 Signup{" "}
@@ -114,7 +112,7 @@ const Login = () => {
             <p>
               Already have an account ?{" "}
               <span
-                className="text-blue-500 border-b font-bold"
+                className="text-indigo-500 border-b font-bold"
                 onClick={() => setShowLoginForm(!showLoginForm)}
               >
                 login{" "}
