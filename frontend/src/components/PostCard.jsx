@@ -6,7 +6,7 @@ import { useNavigate } from "react-router";
 const PostCard = ({ post }) => {
   const postWithHashtags = post.content.replace(
     /(#\w+)/g,
-    '<span class="text-indigo-600"> $1  </span>',
+    '<span class="text-indigo-600 dark:text-indigo-400"> $1  </span>',
   );
   //Example
   //post.content -->  This is a sample paragraph with some #hashtags like #socialmedia and #marketing. Let's find them!
@@ -17,7 +17,7 @@ const PostCard = ({ post }) => {
   const navigate = useNavigate();
   const handleLike = async () => {};
   return (
-    <div className="bg-white rounded-xl shadow p-4 space-y-4 w-full max-w-2xl">
+    <div className="bg-white dark:bg-slate-900 rounded-xl shadow p-4 space-y-4 w-full max-w-2xl">
       {/* User Info */}
       <div
         onClick={() => navigate(`/profile/${post.user._id}`)}
@@ -29,7 +29,7 @@ const PostCard = ({ post }) => {
         />
         <div>
           <div className="flex items-center space-x-1">
-            <span>{post.user?.full_name}</span>
+            <span className="text-slate-800 dark:text-slate-100">{post.user?.full_name}</span>
             <BadgeCheck className="w-4 h-4 text-blue-500" />
           </div>
           <div className="text-gray-500 text-sm">
@@ -41,7 +41,7 @@ const PostCard = ({ post }) => {
       {/* Content */}
       {post.content && (
         <div
-          className="text-gray-800 text-sm whitespace-pre-line"
+          className="text-slate-800 dark:text-slate-100 text-sm whitespace-pre-line"
           dangerouslySetInnerHTML={{ __html: postWithHashtags }} // This allows rendering HTML tags (like <b>, <a>, etc.) from the content, not just text.
         />
       )}
@@ -58,7 +58,7 @@ const PostCard = ({ post }) => {
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-4 text-gray-600 text-sm pt-2 border-t border-gray-300">
+      <div className="flex items-center gap-4 text-gray-600 dark:text-slate-400 text-sm pt-2 border-t border-gray-300 dark:border-gray-700">
         <div className="flex items-center gap-1">
           <Heart
             className={`w-4 h-4 cursor-pointer ${

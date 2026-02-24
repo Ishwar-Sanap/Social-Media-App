@@ -11,7 +11,7 @@ const Login = () => {
       {/* Background Image */}
       <img
         src={assets.bgImage}
-        className="absolute top-0 left-0 -z-1 w-full h-full object-cover"
+        className="absolute top-0 left-0 -z-1 w-full h-full object-cover dark:bg-black/90"
       />
 
       {/* Left Side : Branding */}
@@ -31,13 +31,13 @@ const Login = () => {
                     />
                   ))}
               </div>
-              <p>Used by 1,000+ developers</p>
+              <p className="text-slate-800 dark:text-slate-100 ">Used by 1,000+ developers</p>
             </div>
           </div>
-          <h1 className="text-3xl md:text-6xl md:pb-2 font-bold bg-linear-to-r from-indigo-950 to-indigo-800 bg-clip-text text-transparent">
+          <h1 className="text-3xl md:text-6xl md:pb-2 font-bold bg-linear-to-r from-indigo-950 to-indigo-800 dark:text-slate-300 bg-clip-text text-transparent">
             More than just friends truly connect
           </h1>
-          <p className="text-xl md:text-3xl text-indigo-900 max-w-72 md:max-w-md">
+          <p className="text-xl  md:text-3xl text-indigo-900 dark:text-slate-400 max-w-72 md:max-w-md">
             connect with global community on MyCircle
           </p>
         </div>
@@ -46,49 +46,49 @@ const Login = () => {
 
       {/* Right side: Login or Signup form */}
       <div className="flex-1 flex items-center justify-center p-6 sm:p-10">
-        <div className="flex flex-col bg-slate-100 rounded-2xl shadow-lg p-8 w-full max-w-sm gap-2">
-          <h2 className="text-2xl font-bold text-slate-800 mb-4 text-center">
+        <div className="flex flex-col bg-slate-100 dark:bg-slate-800 rounded-2xl shadow-lg p-8 w-full max-w-sm gap-2">
+          <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4 text-center">
             {showLoginForm ? "Login" : "Signup"}
           </h2>
 
           {!showLoginForm && (
             <>
-              <label className="text-sm font-medium text-slate-600">
+              <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
                 First name
               </label>
               <input
                 type="text"
                 placeholder="Enter first name"
-                className="border border-slate-300 rounded-lg px-4 py-2.5 text-md text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition mb-2"
+                className="border border-slate-300 rounded-lg px-4 py-2.5 text-md text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition mb-2"
               />
             </>
           )}
 
           {!showLoginForm && (
             <>
-              <label className="text-sm font-medium text-slate-600">
+              <label className="text-sm font-medium text-slate-600  dark:text-slate-400">
                 Last name
               </label>
               <input
                 type="text"
                 placeholder="Enter last name"
-                className="border border-slate-300 rounded-lg px-4 py-2.5 text-md text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition mb-2"
+                className="border border-slate-300 rounded-lg px-4 py-2.5 text-md text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition mb-2"
               />
             </>
           )}
 
-          <label className="text-sm font-medium text-slate-600">Email</label>
+          <label className="text-sm font-medium text-slate-600 dark:text-slate-400">Email</label>
           <input
             type="email"
             placeholder="Enter email"
-            className="border border-slate-300 rounded-lg px-4 py-2.5 text-md text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition mb-2"
+            className="border border-slate-300 rounded-lg px-4 py-2.5 text-md text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition mb-2"
           />
 
-          <label className="text-sm font-medium text-slate-600">Password</label>
+          <label className="text-sm font-medium text-slate-600 dark:text-slate-400">Password</label>
           <input
             type="password"
             placeholder="Enter password"
-            className="border border-slate-300 rounded-lg px-4 py-2.5 text-md text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition mb-4"
+            className="border border-slate-300 rounded-lg px-4 py-2.5 text-md text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition mb-4"
           />
 
           <button
@@ -99,7 +99,7 @@ const Login = () => {
           </button>
 
           {showLoginForm ? (
-            <p>
+            <p className="text-slate-600 dark:text-slate-400">
               Don't have an account ?{" "}
               <span
                 className="text-indigo-500 border-b font-bold"
@@ -109,7 +109,7 @@ const Login = () => {
               </span>
             </p>
           ) : (
-            <p>
+            <p className="text-slate-600 dark:text-slate-400">
               Already have an account ?{" "}
               <span
                 className="text-indigo-500 border-b font-bold"
