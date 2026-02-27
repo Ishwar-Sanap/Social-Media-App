@@ -41,7 +41,7 @@ const Discover = () => {
               <input
                 type="text"
                 placeholder="Search people by name, username, bio, or location ... "
-                className="text-gray-600 dark:text-slate-400 pl-10 sm:pl-12 py-2 w-full border border-gray-300 dark:border-gray-700 rounded-md max-sm:text-sm"
+                className="text-slate-800 dark:text-slate-100 pl-10 sm:pl-12 py-2 w-full border border-gray-300 dark:border-gray-700 rounded-md max-sm:text-sm"
                 onChange={(e) => setInput(e.target.value)}
                 value={input}
                 onKeyUp={handleSearch}
