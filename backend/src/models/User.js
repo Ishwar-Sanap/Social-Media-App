@@ -1,12 +1,31 @@
 import mongoose from "mongoose";
-
+import jwt from "jsonwebtoken"
 const userSchema = new mongoose.Schema(
   {
-    full_name: { type: String, required: true },
-    username: { type: String, required: true, unique: true },
-    email: { type: String, required: true, unique: true },
+    full_name: {
+      type: String,
+      required: true,
+      trim: true,
+      minLength: 3,
+      maxLength: 30,
+    },
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      minLength: 3,
+      maxLength: 20,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
     password: { type: String },
-    bio: { type: String },
+    bio: { type: String, maxLength: 300, trim: true },
     profile_picture: {
       type: String,
       default:
@@ -20,6 +39,17 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true, minimize: false },
 );
+
+userSchema.methods.getJWT = function () {
+  //Note in userSchema methods always use noraml function, since we required this
+  // and this can't be used in arrow function
+  const user = this;
+  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+    expiresIn: "1d",
+  }); // userID is encoded and stored the the jwtToken string
+
+  return token;
+};
 
 const User = mongoose.model("User", userSchema);
 

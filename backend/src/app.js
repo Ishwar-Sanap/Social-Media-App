@@ -1,34 +1,15 @@
 import express from "express";
 import "dotenv/config";
 import connectDB from "./configs/db.js";
-import User from "./models/User.js";
+import userAuthRouter from "./routes/userAuthRoutes.js";
+import cookieParser from "cookie-parser";
 const app = express();
 
 await connectDB();
 
-app.use(express.json());
-
-app.post("/signup", async (req, res) => {
-  try {
-    const { full_name, username, email, password } = req.body;
-    const userObj = User({
-      full_name,
-      username,
-      email,
-      password,
-    });
-
-    const user = await userObj.save();
-    res.send(user);
-  } catch (err) {
-    res.status(400).json({ success: false, message: "Error : " + err.message });
-  }
-});
-
-app.get("/", (req, res) => {
-  res.json({ success: true, message: "Hello from server.." });
-});
-
+app.use(express.json()); //middleware to parse JSON data
+app.use(cookieParser()); //middleware to pase Cookies
+app.use("/", userAuthRouter);
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
