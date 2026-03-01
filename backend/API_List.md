@@ -6,6 +6,6 @@
 - POST /logout
 
 ## Profile Management
-- GET /profile/view/:userId
+- GET /profile/view
 - PATCH /profile/edit
 - POST /profile/upload-picture 

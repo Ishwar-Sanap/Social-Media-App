@@ -34,8 +34,8 @@ export const signupUser = async (req, res) => {
 
 export const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const { username, email, password } = req.body;
+    const user = await User.findOne({ $or: [{ email }, { username }] });
     if (!user) throw new Error("Invalid credentials");
     const isValidPassword = await validatePassword(password, user.password);
     if (!isValidPassword) throw new Error("Invalid credentials");
