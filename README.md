@@ -28,6 +28,8 @@
   - jsonwebtoken : For generating and verifying JSON Web Tokens (JWT) for user authentication and authorization.
   - cookie-parser : For parsing cookies in incoming HTTP requests, allowing us to access and manage cookies in our backend code.
   - validator : For validating and sanitizing user input to prevent security vulnerabilities and ensure data integrity.
+  - imageKit : for handling image uploads and storage in the application, providing a convenient way to manage media files.
+  - multer : For handling multipart/form-data, which is commonly used for file uploads in web applications.
 
 - Concepts
   - Using ES6 module syntax for importing and exporting modules in the backend code.
