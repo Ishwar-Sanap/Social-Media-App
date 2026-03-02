@@ -1,7 +1,10 @@
 import express from "express";
 import {
+  discoverUsersProfile,
   editUserProfile,
   getUserProfile,
+  followUser,
+  unFollowUser,
 } from "../controllers/userProfileController.js";
 import { protect } from "../middleware/auth.js";
 import { upload } from "../configs/multer.js";
@@ -18,5 +21,9 @@ userProfileRouter.patch(
   ]),
   editUserProfile,
 );
+
+userProfileRouter.get("/profile/discover", protect, discoverUsersProfile)
+userProfileRouter.post("/profile/follow/:userId", protect, followUser)
+userProfileRouter.post("/profile/unfollow/:userId", protect, unFollowUser)
 
 export default userProfileRouter;

@@ -1,3 +1,4 @@
+import User from "../models/User.js";
 import { validateEditRequestData } from "../utils/dataValidations.js";
 import uploadImageOnImageKit from "../utils/uploadOnImageKit.js";
 export const getUserProfile = async (req, res) => {
@@ -45,5 +46,90 @@ export const editUserProfile = async (req, res) => {
     } else {
       res.status(400).json({ success: false, message: error.message });
     }
+  }
+};
+
+export const discoverUsersProfile = async (req, res) => {
+  try {
+    const loggedInUser = req.user;
+    const { search } = req.query;
+    const searchRegex = new RegExp(search, "i"); // case Insensitive seraching for search text that can appears anywhere in [username, full_name, or location]
+    const allUsers = await User.find({
+      $and: [
+        {
+          $or: [
+            { username: { $regex: searchRegex } },
+            { full_name: { $regex: searchRegex } },
+            { location: { $regex: searchRegex } },
+          ],
+        },
+        { _id: { $ne: loggedInUser._id } },
+      ],
+    });
+    const message = `Number of users found ${allUsers.length}`;
+    res.json({ status: true, data: allUsers, message });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+export const followUser = async (req, res) => {
+  try {
+    //LoggedIn user (A) want to follow the user (B) with userId
+    const { userId } = req.params;
+    const loggedInUser = req.user;
+    const toUser = await User.findById(userId);
+
+    if (!toUser) throw new Error("User not found");
+
+    if (loggedInUser.following.includes(userId))
+      throw new Error("You are already following this user");
+
+    if (userId === loggedInUser._id.toString())
+      throw new Error("Can not follow to yourself");
+
+    loggedInUser.following.push(userId); // A Following to B
+    await loggedInUser.save();
+
+    toUser.followers.push(loggedInUser._id); // A is Follower of B
+    await toUser.save();
+
+    const message = `You are now following '${toUser.full_name}'`;
+
+    res.json({ status: true, message });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+export const unFollowUser = async (req, res) => {
+  try {
+    //LoggedIn user (A) want to UnFollow the user (B) with userId
+    const { userId } = req.params;
+    const loggedInUser = req.user;
+    const toUser = await User.findById(userId);
+
+    if (!toUser) throw new Error("User not found");
+
+    if (!loggedInUser.following.includes(userId))
+      throw new Error("You are not following this user");
+
+    if (userId === loggedInUser._id.toString())
+      throw new Error("Can not Unfollow to yourself");
+
+    // A Unfollow B
+    loggedInUser.following = loggedInUser.following.filter(
+      (id) => id !== userId,
+    );
+    await loggedInUser.save();
+
+    // A is not Followers of B
+    toUser.followers = toUser.followers.filter((id) => id !== loggedInUser._id.toString());
+    await toUser.save();
+
+    const message = `You are no longer following '${toUser.full_name}'`;
+
+    res.json({ status: true, message });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
   }
 };
