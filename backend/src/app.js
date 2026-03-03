@@ -4,6 +4,7 @@ import connectDB from "./configs/db.js";
 import cookieParser from "cookie-parser";
 import userAuthRouter from "./routes/userAuthRoutes.js";
 import userProfileRouter from "./routes/userProfileRoutes.js";
+import connectionRouter from "./routes/connectionRoutes.js";
 const app = express();
 
 await connectDB();
@@ -11,7 +12,9 @@ await connectDB();
 app.use(express.json()); //middleware to parse JSON data
 app.use(cookieParser()); //middleware to pase Cookies
 app.use("/", userAuthRouter);
-app.use("/", userProfileRouter)
+app.use("/", userProfileRouter);
+app.use("/", connectionRouter);
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {

@@ -8,8 +8,17 @@
 
 ## Profile Management
 
-- GET   /profile/view
+- GET /profile/view
 - PATCH /profile/edit
-- GET   /profile/discover/?search=keyword
-- POST  /profile/follow/:userId
-- POST  /profile/unfollow/:userId
+- GET /profile/discover/?search=keyword
+- POST /profile/follow/:userId
+- POST /profile/unfollow/:userId
+
+## Connections
+
+- POST /request/connect/:userId
+- POST /request/accept/:userId
+- GET  /connections
+
+- POST /remove/connection/:userId
+- POST /remove/follower/:userId

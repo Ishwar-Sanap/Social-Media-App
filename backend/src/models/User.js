@@ -37,15 +37,16 @@ const userSchema = new mongoose.Schema(
     },
     cover_photo: {
       type: String,
-      default: "",
+      default:
+        "https://static.vecteezy.com/system/resources/previews/025/255/734/non_2x/network-connection-with-connection-people-for-global-communication-technology-social-networking-and-global-business-background-illustration-vector.jpg",
       validate(value) {
         if (!validator.isURL(value)) throw new Error("Photo URL is invalid");
       },
     },
     location: { type: String, default: "", maxLength: 30 },
-    followers: [{ type: String, ref: "User" }],
-    following: [{ type: String, ref: "User" }],
-    connections: [{ type: String, ref: "User" }],
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    connections: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   },
   { timestamps: true, minimize: false },
 );
