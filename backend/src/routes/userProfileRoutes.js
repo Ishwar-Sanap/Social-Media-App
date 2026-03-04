@@ -5,6 +5,7 @@ import {
   getUserProfile,
   followUser,
   unFollowUser,
+  removeFollower,
 } from "../controllers/userProfileController.js";
 import { protect } from "../middleware/auth.js";
 import { upload } from "../configs/multer.js";
@@ -25,5 +26,6 @@ userProfileRouter.patch(
 userProfileRouter.get("/profile/discover", protect, discoverUsersProfile)
 userProfileRouter.post("/profile/follow/:userId", protect, followUser)
 userProfileRouter.post("/profile/unfollow/:userId", protect, unFollowUser)
+userProfileRouter.post("/remove/follower/:userId", protect, removeFollower)
 
 export default userProfileRouter;

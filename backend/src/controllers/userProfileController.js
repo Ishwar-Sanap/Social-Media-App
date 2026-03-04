@@ -22,7 +22,8 @@ export const editUserProfile = async (req, res) => {
     Object.keys(req.body).forEach((key) => (loggedInUser[key] = req.body[key]));
 
     //Profile and Cover image files parse through multer middleware
-    const profileImg = req.files.profile_picture && req.files.profile_picture[0];
+    const profileImg =
+      req.files.profile_picture && req.files.profile_picture[0];
     const coverImg = req.files.cover_photo && req.files.cover_photo[0];
 
     if (profileImg) {
@@ -123,12 +124,47 @@ export const unFollowUser = async (req, res) => {
     await loggedInUser.save();
 
     // A is not Followers of B
-    toUser.followers = toUser.followers.filter((id) => id !== loggedInUser._id.toString());
+    toUser.followers = toUser.followers.filter(
+      (id) => id !== loggedInUser._id.toString(),
+    );
     await toUser.save();
 
     const message = `You are no longer following '${toUser.full_name}'`;
 
     res.json({ status: true, message });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+export const removeFollower = async (req, res) => {
+  try {
+    const loggedInUser = req.user;
+    const { userId } = req.params;
+
+    if (!loggedInUser.followers.includes(userId))
+      throw new Error("This User is not your follower");
+
+    console.log(loggedInUser.followers)
+
+    loggedInUser.followers = loggedInUser.followers.filter(
+      (uid) => uid.toString() !== userId,
+    );
+
+    await loggedInUser.save();
+
+    const toUser = await User.findById(userId);
+
+    toUser.following = toUser.following.filter(
+      (uid) => uid.toString() !== loggedInUser._id.toString(),
+    );
+
+    await toUser.save();
+
+    res.json({
+      status: true,
+      message: `Successfully removed follower '${toUser.full_name}'`,
+    });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }
