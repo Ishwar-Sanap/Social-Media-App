@@ -47,6 +47,15 @@ export const sendConnectionRequest = async (req, res) => {
       to_user_id: userId,
     });
 
+    //When connection request is sent, automatically follow the user if not following
+    if (!loggedInUser.following.includes(userId)) {
+      loggedInUser.following.push(userId);
+      await loggedInUser.save();
+
+      toUser.followers.push(loggedInUser._id);
+      await toUser.save();
+    }
+
     const message = `Connection request sent successfully to '${toUser.full_name}'`;
     res.json({ success: true, message });
   } catch (error) {
@@ -114,10 +123,102 @@ export const acceptConnectionRequest = async (req, res) => {
     connection.status = "accepted";
     await connection.save();
 
+    //When connection request is accepted,automatically follow back to user who have send connection request
+    if (!loggedInUser.following.includes(userId)) {
+      loggedInUser.following.push(userId);
+      await loggedInUser.save();
+
+      toUser.followers.push(loggedInUser._id);
+      await toUser.save();
+    }
+
     res.json({
       success: true,
       message: `Connection request from '${toUser.full_name}' accepted successfully`,
     });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+//Only reject pending requests
+export const rejectConnectionRequest = async (req, res) => {
+  try {
+    const loggedInUser = req.user;
+    const { userId } = req.params;
+
+    //Find and delete pending connection request
+    const connection = await Connection.findOneAndDelete({
+      from_user_id: userId,
+      to_user_id: loggedInUser._id,
+      status: "pending",
+    });
+
+    if (!connection) throw new Error("Connection request not found");
+
+    res.json({
+      success: true,
+      message: "Connection request rejected successfully",
+    });
+
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+//Only remove connection when both the users are connected..
+export const removeConnection = async (req, res) => {
+  try {
+    const loggedInUser = req.user;
+    const { userId } = req.params;
+
+    const connection = await Connection.findOneAndDelete({
+      $or: [
+        {
+          from_user_id: loggedInUser._id,
+          to_user_id: userId,
+          status: "accepted",
+        },
+        {
+          from_user_id: userId,
+          to_user_id: loggedInUser._id,
+          status: "accepted",
+        },
+      ],
+    });
+
+    if (!connection) throw new Error("Connection not found");
+
+    //After connection is removed between user, automatically removes them from followers and following
+    // So they don't have any relation with each other.
+
+    loggedInUser.following = loggedInUser.following.filter(
+      (uid) => uid.toString() !== userId,
+    );
+    loggedInUser.followers = loggedInUser.followers.filter(
+      (uid) => uid.toString() !== userId,
+    );
+    loggedInUser.connections = loggedInUser.connections.filter(
+      (uid) => uid.toString() !== userId,
+    );
+
+    await loggedInUser.save();
+
+    const toUser = await User.findById(userId);
+
+    toUser.following = toUser.following.filter(
+      (uid) => uid.toString() !== loggedInUser._id.toString(),
+    );
+    toUser.followers = toUser.followers.filter(
+      (uid) => uid.toString() !== loggedInUser._id.toString(),
+    );
+    toUser.connections = toUser.connections.filter(
+      (uid) => uid.toString() !== loggedInUser._id.toString(),
+    );
+
+    await toUser.save();
+
+    res.json({ success: true, message: "Connection removed succesfully" });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }

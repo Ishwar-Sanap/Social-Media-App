@@ -18,6 +18,7 @@
 
 - POST /request/connect/:userId
 - POST /request/accept/:userId
+- POST /request/reject/:userId
 - GET  /connections
 
 - POST /remove/connection/:userId
