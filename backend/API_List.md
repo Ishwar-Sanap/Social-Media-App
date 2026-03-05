@@ -13,13 +13,20 @@
 - GET /profile/discover/?search=keyword
 - POST /profile/follow/:userId
 - POST /profile/unfollow/:userId
+- POST /profile/remove/follower/:userId
+- GET /profile/details/:userId
 
 ## Connections
 
 - POST /request/connect/:userId
 - POST /request/accept/:userId
 - POST /request/reject/:userId
-- GET  /connections
+- GET /connections
 
 - POST /remove/connection/:userId
-- POST /remove/follower/:userId
+
+## Posts
+
+- POST /post/create
+- POST /post/like/:postId
+- GET /post/feed

@@ -1,11 +1,25 @@
+import Post from "../models/Post.js";
 import User from "../models/User.js";
 import { validateEditRequestData } from "../utils/dataValidations.js";
 import uploadImageOnImageKit from "../utils/uploadOnImageKit.js";
 export const getUserProfile = async (req, res) => {
   try {
-    const user = req.user;
+    const loggedInUser = req.user;
 
-    res.json({ success: true, user });
+    res.json({ success: true, user: loggedInUser });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+export const getProfileDetails = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const userProfile = await User.findById(userId);
+    if (!userProfile) throw new Error("User not found");
+
+    const posts = await Post.find({ user: userProfile._id });
+    res.json({ success: true, profile: userProfile, posts });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }
@@ -27,11 +41,19 @@ export const editUserProfile = async (req, res) => {
     const coverImg = req.files.cover_photo && req.files.cover_photo[0];
 
     if (profileImg) {
-      const imgUrl = await uploadImageOnImageKit(profileImg, 512);
+      const imgUrl = await uploadImageOnImageKit(
+        profileImg,
+        "Profile Pics",
+        512,
+      );
       loggedInUser.profile_picture = imgUrl;
     }
     if (coverImg) {
-      const imgUrl = await uploadImageOnImageKit(coverImg, 1280);
+      const imgUrl = await uploadImageOnImageKit(
+        coverImg,
+        "Cover Photos",
+        1280,
+      );
       loggedInUser.cover_photo = imgUrl;
     }
 
@@ -145,7 +167,7 @@ export const removeFollower = async (req, res) => {
     if (!loggedInUser.followers.includes(userId))
       throw new Error("This User is not your follower");
 
-    console.log(loggedInUser.followers)
+    console.log(loggedInUser.followers);
 
     loggedInUser.followers = loggedInUser.followers.filter(
       (uid) => uid.toString() !== userId,
