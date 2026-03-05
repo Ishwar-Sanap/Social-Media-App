@@ -14,7 +14,7 @@ app.use(express.json()); //middleware to parse JSON data
 app.use(cookieParser()); //middleware to pase Cookies
 app.use("/", userAuthRouter);
 app.use("/profile", userProfileRouter);
-app.use("/", connectionRouter);
+app.use("/request", connectionRouter);
 app.use("/post", postRouter);
 
 const PORT = process.env.PORT || 3000;

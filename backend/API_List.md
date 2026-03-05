@@ -21,9 +21,8 @@
 - POST /request/connect/:userId
 - POST /request/accept/:userId
 - POST /request/reject/:userId
-- GET /connections
-
-- POST /remove/connection/:userId
+- GET /request/connections
+- POST /request/remove/connection/:userId
 
 ## Posts
 
