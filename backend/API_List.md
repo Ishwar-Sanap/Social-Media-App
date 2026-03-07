@@ -27,5 +27,6 @@
 ## Posts
 
 - POST /post/create
+- POST /post/delete/:postId
 - POST /post/like/:postId
 - GET /post/feed

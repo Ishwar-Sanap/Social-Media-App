@@ -77,3 +77,21 @@ export const likePost = async (req, res) => {
     res.status(400).json({ success: false, message: error.message });
   }
 };
+
+export const deletePost = async (req, res) => {
+  try {
+    const loggedInUser = req.user;
+    const { postId } = req.params;
+  
+    const post = await Post.findOneAndDelete({
+      _id: postId,
+      user: loggedInUser._id,
+    });
+    if (!post) throw new Error("Post not found");
+
+    res.json({ success: true, message: "Post deleted successfully" });
+    Post.de;
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
