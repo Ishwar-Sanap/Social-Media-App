@@ -13,7 +13,10 @@ const Profile = () => {
   const [posts, setPosts] = useState([]);
   const [activeTab, setActiveTab] = useState("posts");
   const [showEdit, setShowEdit] = useState(false);
-
+  const [openDropDown, setOpenDropDown] = useState(null);
+  const toggleDropDown = (id) => {
+    setOpenDropDown(openDropDown === id ? null : id);
+  };
   const fetchUser = async () => {
     setUser(dummyUserData);
     setPosts(dummyPostsData);
@@ -70,8 +73,15 @@ const Profile = () => {
           {activeTab === "posts" && (
             <div className="mt-6 flex flex-col items-center gap-6">
               {posts.map((post) => (
-                <PostCard key={post._id} post={post} />
-              ))}
+                <PostCard
+                  key={post._id}
+                  post={post}
+                  profileId={profileId}
+                  displyOnProfile={true}
+                  isOpen = {openDropDown === post._id}
+                  onToggle = {()=> toggleDropDown(post._id)}
+                />
+               ))} 
             </div>
           )}
 
@@ -80,7 +90,7 @@ const Profile = () => {
               {posts
                 .filter((post) => post.image_urls.length > 0)
                 .map((post) => (
-                  <div key={post._id} >
+                  <div key={post._id}>
                     {post.image_urls.map((image, indx) => (
                       <Link
                         target="_blank"
@@ -108,7 +118,7 @@ const Profile = () => {
         </div>
       </div>
 
-      {showEdit && <ProfileModal setShowEdit={setShowEdit}/>}
+      {showEdit && <ProfileModal setShowEdit={setShowEdit} />}
     </div>
   ) : (
     <Loading />

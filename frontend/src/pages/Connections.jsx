@@ -14,6 +14,7 @@ import {
   dummyPendingConnectionsData as pendingConnections,
 } from "../assets/assets";
 import { useNavigate } from "react-router";
+import ActionConfirmPopup from "../components/ActionConfirmPopup";
 
 const Connections = () => {
   const navigate = useNavigate();
@@ -154,7 +155,7 @@ const Connections = () => {
                           onClick={() => handleRemoveClick(user)}
                           className="w-full p-2 text-sm rounded bg-slate-100 dark:bg-slate-300 text-black active: scale-95 transition cursor-pointer hover:bg-red-400"
                         >
-                         Reject
+                          Reject
                         </button>
                       </div>
                     )}
@@ -186,56 +187,32 @@ const Connections = () => {
 
       {/* Confirm Modal */}
       {showConfirmModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-2xl max-w-sm w-full">
-            <p className="mb-4 text-gray-700 dark:text-gray-300">
-              {currTab === "Followers" && (
-                <>
-                  Are you sure you want to remove&nbsp;
-                  <span className="font-semibold text-red-500">
-                    {selectedUser.username}
-                  </span>
-                  &nbsp; from followers? <br /> This action cannot be undone.
-                </>
-              )}
-              {currTab === "Pending" && (
-                <>
-                  Are you sure you want to remove pending connection request
-                  from&nbsp;
-                  <span className="font-semibold text-red-500">
-                    {selectedUser.username}
-                  </span>
-                  &nbsp;? <br />
-                  This action cannot be undone.
-                </>
-              )}
-              {currTab === "Connections" && (
-                <>
-                  Are you sure you want to remove connection with&nbsp;
-                  <span className="font-semibold text-red-500">
-                    {selectedUser.username}
-                  </span>
-                  &nbsp;? <br />
-                  This action cannot be undone.
-                </>
-              )}
-            </p>
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={handleCancel}
-                className="px-4 py-2 rounded bg-gray-200 dark:bg-gray-700 text-black dark:text-white cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirmRemove}
-                className="px-4 py-2 rounded bg-red-500 text-white cursor-pointer hover:bg-red-600"
-              >
-                Remove
-              </button>
-            </div>
-          </div>
-        </div>
+        <>
+          {currTab === "Followers" && (
+            <ActionConfirmPopup
+              actionType={"removeFollower"}
+              username={selectedUser.username}
+              onCancel={handleCancel}
+              onConfirm={handleConfirmRemove}
+            />
+          )}
+          {currTab === "Pending" && (
+            <ActionConfirmPopup
+              actionType={"rejectRequest"}
+              username={selectedUser.username}
+              onCancel={handleCancel}
+              onConfirm={handleConfirmRemove}
+            />
+          )}
+          {currTab === "Connections" && (
+            <ActionConfirmPopup
+              actionType={"removeConnection"}
+              username={selectedUser.username}
+              onCancel={handleCancel}
+              onConfirm={handleConfirmRemove}
+            />
+          )}
+        </>
       )}
     </div>
   );
