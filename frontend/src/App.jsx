@@ -10,10 +10,11 @@ import Profile from "./pages/Profile";
 import CreatePost from "./pages/CreatePost";
 import Layout from "./pages/Layout";
 import { Toaster } from "react-hot-toast";
+import { useSelector } from "react-redux";
 
 const App = () => {
   //User login details will be there in store when logged in
-  const user = true;
+  const user = useSelector((state) => state.user);
   return (
     <>
       <Toaster />

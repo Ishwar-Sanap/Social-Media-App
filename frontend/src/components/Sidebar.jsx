@@ -11,7 +11,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const theme = useSelector((state) => state.theme);
   const dispatch = useDispatch();
 
-  const user = dummyUserData;
+  const user = useSelector((state)=> state.user);
 
   const handleToggleTheme = () => {
     document.body.classList.toggle("dark");

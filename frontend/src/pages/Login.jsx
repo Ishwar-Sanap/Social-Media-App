@@ -1,10 +1,40 @@
 import React, { useState } from "react";
 import { assets } from "../assets/assets";
 import { Star } from "lucide-react";
+import { loginUser } from "../api/userAuthService";
+import { useDispatch } from "react-redux";
+import { addUser } from "../store/userSlice";
 
 const Login = () => {
   const [showLoginForm, setShowLoginForm] = useState(true);
-  const handleSubmit = () => {};
+
+  const dispatch = useDispatch();
+  
+  const handleSubmit = (formData) => {
+    const email = formData.get("email");
+    const password = formData.get("password");
+
+    //Handle Login
+    if (showLoginForm) {
+      async function loginTheUser() {
+        try{
+
+          const res = await loginUser({ email, password });
+          console.log(res.data)
+          dispatch(addUser(res.data?.user))
+        }
+        catch(err)
+        {
+          console.log(err.response.data)
+        }
+      }
+
+      loginTheUser();
+    } else {
+      //Handle Signup
+    }
+    console.log("Submit form");
+  };
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
@@ -31,7 +61,9 @@ const Login = () => {
                     />
                   ))}
               </div>
-              <p className="text-slate-800 dark:text-slate-100 ">Used by 1,000+ developers</p>
+              <p className="text-slate-800 dark:text-slate-100 ">
+                Used by 1,000+ developers
+              </p>
             </div>
           </div>
           <h1 className="text-3xl md:text-6xl md:pb-2 font-bold bg-linear-to-r from-indigo-950 to-indigo-800 dark:text-slate-300 bg-clip-text text-transparent">
@@ -46,7 +78,10 @@ const Login = () => {
 
       {/* Right side: Login or Signup form */}
       <div className="flex-1 flex items-center justify-center p-6 sm:p-10">
-        <div className="flex flex-col bg-slate-100 dark:bg-slate-800 rounded-2xl shadow-lg p-8 w-full max-w-sm gap-2">
+        <form
+          action={handleSubmit}
+          className="flex flex-col bg-slate-100 dark:bg-slate-800 rounded-2xl shadow-lg p-8 w-full max-w-sm gap-2"
+        >
           <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4 text-center">
             {showLoginForm ? "Login" : "Signup"}
           </h2>
@@ -59,6 +94,7 @@ const Login = () => {
               <input
                 type="text"
                 placeholder="Enter first name"
+                name="firstName"
                 className="border border-slate-300 rounded-lg px-4 py-2.5 text-md text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition mb-2"
               />
             </>
@@ -72,28 +108,35 @@ const Login = () => {
               <input
                 type="text"
                 placeholder="Enter last name"
+                name="lastName"
                 className="border border-slate-300 rounded-lg px-4 py-2.5 text-md text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition mb-2"
               />
             </>
           )}
 
-          <label className="text-sm font-medium text-slate-600 dark:text-slate-400">Email</label>
+          <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
+            Email
+          </label>
           <input
             type="email"
             placeholder="Enter email"
+            name="email"
             className="border border-slate-300 rounded-lg px-4 py-2.5 text-md text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition mb-2"
           />
 
-          <label className="text-sm font-medium text-slate-600 dark:text-slate-400">Password</label>
+          <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
+            Password
+          </label>
           <input
             type="password"
             placeholder="Enter password"
+            name="password"
             className="border border-slate-300 rounded-lg px-4 py-2.5 text-md text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition mb-4"
           />
 
           <button
+            type="submit"
             className="py-2.5 rounded-lg bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indio-700 hover:to-indigo-800 active:scale-95 transition text-white cursor-pointer shadow-md"
-            onClick={handleSubmit}
           >
             {showLoginForm ? "Login" : "Signup"}
           </button>
@@ -119,7 +162,7 @@ const Login = () => {
               </span>
             </p>
           )}
-        </div>
+        </form>
       </div>
     </div>
   );
