@@ -6,6 +6,7 @@ import userAuthRouter from "./routes/userAuthRoutes.js";
 import userProfileRouter from "./routes/userProfileRoutes.js";
 import connectionRouter from "./routes/connectionRoutes.js";
 import postRouter from "./routes/postRoutes.js";
+import storyRouter from "./routes/storyRoutes.js";
 const app = express();
 
 await connectDB();
@@ -16,6 +17,7 @@ app.use("/", userAuthRouter);
 app.use("/profile", userProfileRouter);
 app.use("/request", connectionRouter);
 app.use("/post", postRouter);
+app.use("/story", storyRouter)
 
 const PORT = process.env.PORT || 3000;
 

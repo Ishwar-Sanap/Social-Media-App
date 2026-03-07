@@ -35,3 +35,5 @@
   - Using ES6 module syntax for importing and exporting modules in the backend code.
     type: "module" is added in package.json to enable this feature
   - express.json() middleware is used to parse incoming JSON payloads in request and sending JSON responses back to the client. It allows us to easily handle JSON data in our API endpoints.
+- JWT (JSON Web Tokens) is used for user authentication and authorization in the application. It allows us to securely transmit information between the client and server in protected routes and manage user sessions effectively.
+- Sheduling background tasks using node-cron to perform periodic operations such as sending notifications, deleting old user stories data , or performing maintenance tasks at specified intervals.

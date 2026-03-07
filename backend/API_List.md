@@ -30,3 +30,9 @@
 - POST /post/delete/:postId
 - POST /post/like/:postId
 - GET /post/feed
+
+## Stories
+- POST /story/create
+- POST /story/delete/:storyId
+- GET /story/get
+- POST /story/seen/:storyId

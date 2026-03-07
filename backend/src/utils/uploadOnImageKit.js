@@ -1,12 +1,12 @@
 import fs from "fs";
 import imageKit from "../configs/imagekit.js";
 
-export const uploadImageOnImageKit = async (file,folderName ,width = 512) => {
+export const uploadImageOnImageKit = async (file, folderName, width = 512) => {
   const readStream = fs.createReadStream(file.path);
   const response = await imageKit.files.upload({
     file: readStream,
     fileName: file.originalname,
-    folder:folderName
+    folder: folderName,
   });
 
   // URL with basic transformations
@@ -26,4 +26,13 @@ export const uploadImageOnImageKit = async (file,folderName ,width = 512) => {
   return transformedUrl;
 };
 
-export default uploadImageOnImageKit;
+export const uploadMediaOnImageKit = async (file, folderName) => {
+  const readStream = fs.createReadStream(file.path);
+  const response = await imageKit.files.upload({
+    file: readStream,
+    fileName: file.originalname,
+    folder: folderName,
+  });
+
+  return response.url;
+};

@@ -1,7 +1,7 @@
 import Post from "../models/Post.js";
 import User from "../models/User.js";
 import { validateEditRequestData } from "../utils/dataValidations.js";
-import uploadImageOnImageKit from "../utils/uploadOnImageKit.js";
+import {uploadImageOnImageKit} from "../utils/uploadOnImageKit.js";
 export const getUserProfile = async (req, res) => {
   try {
     const loggedInUser = req.user;

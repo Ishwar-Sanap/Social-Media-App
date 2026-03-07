@@ -1,5 +1,5 @@
 import Post from "../models/Post.js";
-import uploadImageOnImageKit from "../utils/uploadOnImageKit.js";
+import {uploadImageOnImageKit} from "../utils/uploadOnImageKit.js";
 
 export const createPost = async (req, res) => {
   try {
