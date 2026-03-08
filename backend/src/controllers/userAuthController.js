@@ -24,7 +24,7 @@ export const signupUser = async (req, res) => {
   } catch (error) {
     if (error.name === "MongoServerError" && error.code === 11000) {
       const field = Object.keys(error.keyValue)[0];
-      const errorMessage = `Error : The ${field} '${error.keyValue[field]}' already exists.`;
+      const errorMessage = `The ${field} '${error.keyValue[field]}' already exists.`;
       res.status(400).json({ success: false, message: errorMessage });
     } else {
       res.status(400).json({ success: false, message: error.message });

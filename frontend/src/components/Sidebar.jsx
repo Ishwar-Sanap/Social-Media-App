@@ -5,17 +5,28 @@ import MenuItems from "./MenuItems";
 import { CirclePlus, LogOut, Moon, Sun } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { setTheme } from "../store/themeSlice";
+import { logoutUser } from "../api/userAuthService";
+import { removeUser } from "../store/userSlice";
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const navigate = useNavigate();
   const theme = useSelector((state) => state.theme);
   const dispatch = useDispatch();
 
-  const user = useSelector((state)=> state.user);
+  const user = useSelector((state) => state.user);
 
   const handleToggleTheme = () => {
     document.body.classList.toggle("dark");
     dispatch(setTheme(theme === "light" ? "dark" : "light"));
+  };
+
+  const handleLogOut = async () => {
+    try {
+      const resp = await logoutUser();
+      dispatch(removeUser()); // remove user from the store
+    } catch (error) {
+     
+    }
   };
   return (
     <div
@@ -57,11 +68,15 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
         <div className="flex gap-2 items-center cursor-pointer">
           <img src={user.profile_picture} className="w-10 rounded-full" />
           <div className="">
-            <h1 className="text-sm font-medium text-slate-800 dark:text-slate-100">{user.full_name}</h1>
+            <h1 className="text-sm font-medium text-slate-800 dark:text-slate-100">
+              {user.full_name}
+            </h1>
             <p className="text-xs text-gray-500 ">@{user.username}</p>
           </div>
         </div>
-        <LogOut className="w-5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition cursor-pointer" />
+        <button className="cursor-pointer" onClick={handleLogOut}>
+          <LogOut className="w-5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition " />
+        </button>
       </div>
     </div>
   );

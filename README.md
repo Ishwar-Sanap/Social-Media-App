@@ -17,6 +17,9 @@
     To display the image in the frontend we are using URL.createObjectURL() method to create a temporary URL for the image file and then using that URL as the source for an `<img>` tag.
   - For enabling dark mode using tailwindcss, we are using the `dark` variant in our CSS classes.
     We can toggledark mode by adding or removing the `dark` class from the root element of our application
+  - Used axios for making HTTP requests to the backend API, allowing us to fetch and send data between the frontend and backend of application. 
+    and used api service layer to centralize and manage all API calls in one place, making it easier to maintain and update the codebase. 
+    handled errors on the frontend by catching errors from API calls and displaying appropriate error messages to users.
 
 ## Backend
 

@@ -10,11 +10,28 @@ import Profile from "./pages/Profile";
 import CreatePost from "./pages/CreatePost";
 import Layout from "./pages/Layout";
 import { Toaster } from "react-hot-toast";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { getProfile } from "./api/profileService";
+import { addUser } from "./store/userSlice";
 
 const App = () => {
-  //User login details will be there in store when logged in
+  const dispatch = useDispatch();
+  //User details will be there in store when logged in
   const user = useSelector((state) => state.user);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const resp = await getProfile();
+        dispatch(addUser(resp.data?.user));
+      } catch (error) {
+        // console.log(error.message);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
   return (
     <>
       <Toaster />

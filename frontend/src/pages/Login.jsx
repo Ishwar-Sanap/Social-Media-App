@@ -1,39 +1,60 @@
 import React, { useState } from "react";
 import { assets } from "../assets/assets";
 import { Star } from "lucide-react";
-import { loginUser } from "../api/userAuthService";
+import { loginUser, signupUser } from "../api/userAuthService";
 import { useDispatch } from "react-redux";
 import { addUser } from "../store/userSlice";
 
 const Login = () => {
   const [showLoginForm, setShowLoginForm] = useState(true);
-
+  const [errorMsg, setErrorMsg] = useState(null);
   const dispatch = useDispatch();
-  
-  const handleSubmit = (formData) => {
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+
     const email = formData.get("email");
     const password = formData.get("password");
 
     //Handle Login
     if (showLoginForm) {
       async function loginTheUser() {
-        try{
-
+        try {
           const res = await loginUser({ email, password });
-          console.log(res.data)
-          dispatch(addUser(res.data?.user))
-        }
-        catch(err)
-        {
-          console.log(err.response.data)
+          dispatch(addUser(res.data?.user));
+        } catch (err) {
+          setErrorMsg(err.response.data?.message);
         }
       }
 
       loginTheUser();
     } else {
       //Handle Signup
+      const username = formData.get("userName");
+      const full_name = formData.get("fullName");
+
+      async function signupNewUser() {
+        try {
+          const res = await signupUser({
+            full_name,
+            username,
+            email,
+            password,
+          });
+          dispatch(addUser(res.data?.user));
+        } catch (err) {
+          setErrorMsg(err.response.data?.message);
+        }
+      }
+
+      signupNewUser();
     }
-    console.log("Submit form");
+  };
+
+  const handleChange = (e) => {
+    setErrorMsg(null);
   };
 
   return (
@@ -79,7 +100,8 @@ const Login = () => {
       {/* Right side: Login or Signup form */}
       <div className="flex-1 flex items-center justify-center p-6 sm:p-10">
         <form
-          action={handleSubmit}
+          onChange={handleChange}
+          onSubmit={handleSubmit}
           className="flex flex-col bg-slate-100 dark:bg-slate-800 rounded-2xl shadow-lg p-8 w-full max-w-sm gap-2"
         >
           <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4 text-center">
@@ -89,12 +111,13 @@ const Login = () => {
           {!showLoginForm && (
             <>
               <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                First name
+                Full name
               </label>
               <input
                 type="text"
-                placeholder="Enter first name"
-                name="firstName"
+                placeholder="Enter full name"
+                required
+                name="fullName"
                 className="border border-slate-300 rounded-lg px-4 py-2.5 text-md text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition mb-2"
               />
             </>
@@ -102,13 +125,14 @@ const Login = () => {
 
           {!showLoginForm && (
             <>
-              <label className="text-sm font-medium text-slate-600  dark:text-slate-400">
-                Last name
+              <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                User name
               </label>
               <input
                 type="text"
-                placeholder="Enter last name"
-                name="lastName"
+                placeholder="Enter user name"
+                required
+                name="userName"
                 className="border border-slate-300 rounded-lg px-4 py-2.5 text-md text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition mb-2"
               />
             </>
@@ -121,6 +145,7 @@ const Login = () => {
             type="email"
             placeholder="Enter email"
             name="email"
+            required
             className="border border-slate-300 rounded-lg px-4 py-2.5 text-md text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition mb-2"
           />
 
@@ -131,9 +156,13 @@ const Login = () => {
             type="password"
             placeholder="Enter password"
             name="password"
+            required
+            autoComplete=""
             className="border border-slate-300 rounded-lg px-4 py-2.5 text-md text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition mb-4"
           />
 
+          {/* Show Error Message */}
+          {errorMsg && <p className="text-red-500">Error : {errorMsg}</p>}
           <button
             type="submit"
             className="py-2.5 rounded-lg bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indio-700 hover:to-indigo-800 active:scale-95 transition text-white cursor-pointer shadow-md"
