@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
-import { dummyPostsData, dummyUserData } from "../assets/assets";
 import Loading from "../components/Loading";
 import UserProfileInfo from "../components/UserProfileInfo";
 import PostCard from "../components/PostCard";
 import moment from "moment";
 import ProfileModal from "../components/ProfileModal";
+import { fetchProfileDetails } from "../api/profileService";
+import { useSelector } from "react-redux";
+import ErrorComponent from "../components/ErrorComponent";
 
 const Profile = () => {
   const { profileId } = useParams();
@@ -14,17 +16,36 @@ const Profile = () => {
   const [activeTab, setActiveTab] = useState("posts");
   const [showEdit, setShowEdit] = useState(false);
   const [openDropDown, setOpenDropDown] = useState(null);
+  const [error, setError] = useState(false);
+  const loggedInUser = useSelector((state) => state.user);
+
   const toggleDropDown = (id) => {
     setOpenDropDown(openDropDown === id ? null : id);
   };
-  const fetchUser = async () => {
-    setUser(dummyUserData);
-    setPosts(dummyPostsData);
+  const getUserProfileDetails = async () => {
+    try {
+      const resp = await fetchProfileDetails(
+        profileId ? profileId : loggedInUser._id,
+      );
+      setUser(resp.data?.profile);
+      setPosts(resp.data?.posts);
+      console.log(resp.data);
+    } catch (error) {
+      setError(true);
+    }
   };
 
   useEffect(() => {
-    fetchUser();
+    getUserProfileDetails();
   }, []);
+
+  if (error)
+    return (
+      <ErrorComponent
+        message={"User profile deatils not found !!"}
+        onRetry={getUserProfileDetails}
+      />
+    );
 
   return user ? (
     <div className="h-full overflow-y-scroll no-scrollbar bg-slate-100 dark:bg-slate-800 ">
@@ -75,13 +96,13 @@ const Profile = () => {
               {posts.map((post) => (
                 <PostCard
                   key={post._id}
-                  post={post}
+                  post={{ ...post, user: user }}
                   profileId={profileId}
                   displyOnProfile={true}
-                  isOpen = {openDropDown === post._id}
-                  onToggle = {()=> toggleDropDown(post._id)}
+                  isOpen={openDropDown === post._id}
+                  onToggle={() => toggleDropDown(post._id)}
                 />
-               ))} 
+              ))}
             </div>
           )}
 
