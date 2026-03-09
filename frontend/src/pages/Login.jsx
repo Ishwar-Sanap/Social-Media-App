@@ -4,6 +4,7 @@ import { Star } from "lucide-react";
 import { loginUser, signupUser } from "../api/userAuthService";
 import { useDispatch } from "react-redux";
 import { addUser } from "../store/userSlice";
+import { isValidEmail } from "../utils/inputValidations";
 
 const Login = () => {
   const [showLoginForm, setShowLoginForm] = useState(true);
@@ -22,7 +23,12 @@ const Login = () => {
     if (showLoginForm) {
       async function loginTheUser() {
         try {
-          const res = await loginUser({ email, password });
+          let res = null;
+          if (isValidEmail(email)) {
+            res = await loginUser({ email, password });
+          } else {
+            res = await loginUser({ username: email, password });
+          }
           dispatch(addUser(res.data?.user));
         } catch (err) {
           setErrorMsg(err.response.data?.message);
@@ -126,11 +132,11 @@ const Login = () => {
           {!showLoginForm && (
             <>
               <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                User name
+                Username
               </label>
               <input
                 type="text"
-                placeholder="Enter user name"
+                placeholder="Enter username"
                 required
                 name="userName"
                 className="border border-slate-300 rounded-lg px-4 py-2.5 text-md text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition mb-2"
@@ -138,16 +144,33 @@ const Login = () => {
             </>
           )}
 
-          <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
-            Email
-          </label>
-          <input
-            type="email"
-            placeholder="Enter email"
-            name="email"
-            required
-            className="border border-slate-300 rounded-lg px-4 py-2.5 text-md text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition mb-2"
-          />
+          {showLoginForm ? (
+            <>
+              <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                Email / Username
+              </label>
+              <input
+                type="text"
+                placeholder="Enter email or Username"
+                name="email"
+                required
+                className="border border-slate-300 rounded-lg px-4 py-2.5 text-md text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition mb-2"
+              />
+            </>
+          ) : (
+            <>
+              <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                Email
+              </label>
+              <input
+                type="text"
+                placeholder="Enter email"
+                name="email"
+                required
+                className="border border-slate-300 rounded-lg px-4 py-2.5 text-md text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition mb-2"
+              />
+            </>
+          )}
 
           <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
             Password
@@ -174,7 +197,7 @@ const Login = () => {
             <p className="text-slate-600 dark:text-slate-400">
               Don't have an account ?{" "}
               <span
-                className="text-indigo-500 border-b font-bold"
+                className="text-indigo-500 border-b font-bold cursor-pointer"
                 onClick={() => setShowLoginForm(!showLoginForm)}
               >
                 Signup{" "}
@@ -184,7 +207,7 @@ const Login = () => {
             <p className="text-slate-600 dark:text-slate-400">
               Already have an account ?{" "}
               <span
-                className="text-indigo-500 border-b font-bold"
+                className="text-indigo-500 border-b font-bold cursor-pointer"
                 onClick={() => setShowLoginForm(!showLoginForm)}
               >
                 login{" "}
