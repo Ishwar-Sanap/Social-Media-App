@@ -5,10 +5,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { saveProfileDetails } from "../api/profileService";
 import toast from "react-hot-toast";
 import { addUser } from "../store/userSlice";
+import { isValidUserName } from "../utils/inputValidations";
 
 const ProfileModal = ({ setShowEdit }) => {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const [error, setError] = useState("");
   const [editForm, setEditForm] = useState({
     username: user.username,
     bio: user.bio,
@@ -24,8 +26,15 @@ const ProfileModal = ({ setShowEdit }) => {
     const tostId = toast.loading("Saving changes...");
     const updatedData = {};
 
-    if (editForm.username.trim() !== user.username)
+    if (editForm.username.trim() !== user.username) {
+      if (!isValidUserName(editForm.username))
+      {
+        setError("Error : Username is not valid");
+        toast.dismiss(tostId)
+        return;
+      }
       updatedData.username = editForm.username;
+    }
 
     if (editForm.full_name.trim() !== user.full_name)
       updatedData.full_name = editForm.full_name;
@@ -60,9 +69,15 @@ const ProfileModal = ({ setShowEdit }) => {
         toast.success("Profile details updated!", { id: tostId });
       }, [1000]);
     } catch (error) {
+      setError(error.response?.data?.message);
+      console.log(error.response?.data?.message);
       toast.error("Failed to save data!", { id: tostId });
     }
   };
+
+  useEffect(() => {
+    setError("");
+  }, [editForm]);
 
   return (
     <div className="fixed top-0 bottom-0 left-0 right-0 z-110 h-screen overflow-y-scroll bg-black/50">
@@ -191,7 +206,10 @@ const ProfileModal = ({ setShowEdit }) => {
                 className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg  text-black dark:text-slate-50"
                 placeholder="Please enter a username"
                 onChange={(e) =>
-                  setEditForm({ ...editForm, username: e.target.value })
+                  setEditForm({
+                    ...editForm,
+                    username: e.target.value.toLowerCase(),
+                  })
                 }
                 value={editForm.username}
                 required
@@ -227,9 +245,9 @@ const ProfileModal = ({ setShowEdit }) => {
                 value={editForm.location}
               />
             </div>
-
+            {error.length !== 0 && <p className="text-red-400">{error}</p>}
             {/* Action Buttons */}
-            <div className="flex justify-end space-x-3 pt-6">
+            <div className="flex justify-end space-x-3 pt-2">
               <button
                 onClick={() => setShowEdit(false)}
                 type="button"
