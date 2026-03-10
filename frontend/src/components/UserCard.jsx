@@ -17,7 +17,8 @@ const UserCard = ({ user }) => {
         <img
           src={user.profile_picture}
           alt=""
-          className="rounded-full w-16 shadow-md mx-auto"
+          className="rounded-full w-16 shadow-md mx-auto cursor-pointer"
+          onClick={()=> navigate(`/profile/${user._id}`)}
         />
         <p className="mt-4 font-semibold text-slate-800 dark:text-slate-100">
           {user.full_name}

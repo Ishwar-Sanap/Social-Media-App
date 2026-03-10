@@ -11,7 +11,7 @@ import ErrorComponent from "../components/ErrorComponent";
 
 const Profile = () => {
   const { profileId } = useParams();
-  const [user, setUser] = useState(null);
+  const [userFromResponse, setUserFromResponse] = useState(null);
   const [posts, setPosts] = useState([]);
   const [activeTab, setActiveTab] = useState("posts");
   const [showEdit, setShowEdit] = useState(false);
@@ -27,9 +27,10 @@ const Profile = () => {
       const resp = await fetchProfileDetails(
         profileId ? profileId : loggedInUser._id,
       );
-      setUser(resp.data?.profile);
+
+      if (profileId) setUserFromResponse(resp.data?.profile);
+
       setPosts(resp.data?.posts);
-      console.log(resp.data);
     } catch (error) {
       setError(true);
     }
@@ -46,6 +47,8 @@ const Profile = () => {
         onRetry={getUserProfileDetails}
       />
     );
+
+  const user = userFromResponse || loggedInUser;
 
   return user ? (
     <div className="h-full overflow-y-scroll no-scrollbar bg-slate-100 dark:bg-slate-800 ">

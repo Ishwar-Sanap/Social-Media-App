@@ -6,21 +6,36 @@ import {
   UserPlus,
   UserRoundPen,
 } from "lucide-react";
-import React, { useState } from "react";
-import {
-  dummyConnectionsData as connections,
-  dummyFollowersData as follwers,
-  dummyFollowingData as following,
-  dummyPendingConnectionsData as pendingConnections,
-} from "../assets/assets";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import ActionConfirmPopup from "../components/ActionConfirmPopup";
+import { fetchConnectionsData } from "../api/connectionsService";
+import Loading from "../components/Loading";
+import ErrorComponent from "../components/ErrorComponent";
 
 const Connections = () => {
   const navigate = useNavigate();
   const [currTab, setCurrTab] = useState("Followers");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [connectionsData, setConnectionsData] = useState(null);
+  const [error, setError] = useState(false);
+
+  const getConnectionsData = async () => {
+    setError(false);
+    try {
+      const resp = await fetchConnectionsData();
+      setConnectionsData(resp.data);
+    } catch (error) {
+      setTimeout(() => {
+        setError(true);
+      }, 1000);
+    }
+  };
+
+  useEffect(() => {
+    getConnectionsData();
+  }, []);
 
   const handleRemoveClick = (userToRemove) => {
     setSelectedUser(userToRemove);
@@ -37,11 +52,23 @@ const Connections = () => {
     setSelectedUser(null);
   };
 
+  if (error) return <ErrorComponent onRetry={getConnectionsData} />;
+
+  if (!connectionsData) return <Loading />;
+
   const dataArray = [
-    { lable: "Followers", value: follwers, icon: User },
-    { lable: "Following", value: following, icon: UserCheck },
-    { lable: "Pending", value: pendingConnections, icon: UserRoundPen },
-    { lable: "Connections", value: connections, icon: UserPlus },
+    { lable: "Followers", value: connectionsData.followers, icon: User },
+    { lable: "Following", value: connectionsData.following, icon: UserCheck },
+    {
+      lable: "Pending",
+      value: connectionsData.pendingConnections,
+      icon: UserRoundPen,
+    },
+    {
+      lable: "Connections",
+      value: connectionsData.connections,
+      icon: UserPlus,
+    },
   ];
   return (
     <div className="h-full overflow-y-scroll no-scrollbar bg-slate-100 dark:bg-slate-800 ">
@@ -64,7 +91,7 @@ const Connections = () => {
               className="flex flex-col items-center justify-center gap-1 border h-20 w-40 border-gray-300 dark:border-gray-700 bg-white dark:bg-slate-900 shadow rounded-md"
             >
               <b className="text-slate-800 dark:text-slate-100 ">
-                {item.value.length}
+                {item.value?.length}
               </b>
               <p className="text-slate-600 dark:text-slate-400 ">
                 {item.lable}
@@ -99,20 +126,20 @@ const Connections = () => {
             .find((item) => item.lable === currTab)
             .value.map((user) => (
               <div
-                key={user._id}
+                key={user?._id}
                 className="w-full max-w-88 flex gap-5 p-6 bg-white dark:bg-slate-900 shadow rounded-md  hover:scale-105 transition duration-300 ease-in-out"
               >
                 <img
-                  src={user.profile_picture}
+                  src={user?.profile_picture}
                   className="rounded-full w-12 h-12 shadow-md mx-auto"
                 />
                 <div className="flex-1">
                   <p className="font-medium text-slate-800 dark:text-slate-100">
-                    {user.full_name}
+                    {user?.full_name}
                   </p>
-                  <p className="text-gray-500">@{user.username}</p>
+                  <p className="text-gray-500">@{user?.username}</p>
                   <p className="text-sm text-gray-600 dark:text-slate-400">
-                    {user.bio.slice(0, 30)}...
+                    {user?.bio ? user.bio.slice(0, 30) + "..." : ""}
                   </p>
 
                   {/* Actions */}

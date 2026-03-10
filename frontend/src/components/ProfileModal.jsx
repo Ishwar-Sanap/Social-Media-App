@@ -1,9 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { dummyUserData } from "../assets/assets";
 import { Pencil, X } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { saveProfileDetails } from "../api/profileService";
+import toast from "react-hot-toast";
+import { addUser } from "../store/userSlice";
 
 const ProfileModal = ({ setShowEdit }) => {
-  const user = dummyUserData;
+  const user = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   const [editForm, setEditForm] = useState({
     username: user.username,
     bio: user.bio,
@@ -15,12 +20,54 @@ const ProfileModal = ({ setShowEdit }) => {
 
   const handleSaveForm = async (e) => {
     e.preventDefault();
+
+    const tostId = toast.loading("Saving changes...");
+    const updatedData = {};
+
+    if (editForm.username.trim() !== user.username)
+      updatedData.username = editForm.username;
+
+    if (editForm.full_name.trim() !== user.full_name)
+      updatedData.full_name = editForm.full_name;
+
+    if (editForm.bio.trim() !== user.bio) updatedData.bio = editForm.bio;
+
+    if (editForm.location.trim() !== user.location)
+      updatedData.location = editForm.location;
+
+    if (editForm.profile_picture)
+      updatedData.profile_picture = editForm.profile_picture;
+
+    if (editForm.cover_photo) updatedData.cover_photo = editForm.cover_photo;
+
+    if (Object.keys(updatedData).length === 0) {
+      toast.error("Please edit at least one field", { id: tostId });
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+
+      Object.keys(updatedData).forEach((key) => {
+        formData.append(key, updatedData[key]);
+      });
+
+      const resp = await saveProfileDetails(formData);
+
+      dispatch(addUser(resp.data?.user));
+
+      setTimeout(() => {
+        toast.success("Profile details updated!", { id: tostId });
+      }, [1000]);
+    } catch (error) {
+      toast.error("Failed to save data!", { id: tostId });
+    }
   };
+
   return (
     <div className="fixed top-0 bottom-0 left-0 right-0 z-110 h-screen overflow-y-scroll bg-black/50">
       <div className="max-w-xl sm:py-6 mx-auto">
         <div className="bg-white dark:bg-slate-900 rounded-lg shadow p-6">
-          
           <div className="flex justify-between">
             <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-6">
               Edit Profile
@@ -117,7 +164,6 @@ const ProfileModal = ({ setShowEdit }) => {
                   </div>
                 </label>
               </div>
-              
             </div>
 
             <div>
@@ -132,6 +178,7 @@ const ProfileModal = ({ setShowEdit }) => {
                   setEditForm({ ...editForm, full_name: e.target.value })
                 }
                 value={editForm.full_name}
+                required
               />
             </div>
 
@@ -147,6 +194,7 @@ const ProfileModal = ({ setShowEdit }) => {
                   setEditForm({ ...editForm, username: e.target.value })
                 }
                 value={editForm.username}
+                required
               />
             </div>
 
