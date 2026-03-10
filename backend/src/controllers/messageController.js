@@ -10,7 +10,7 @@ export const sendMessage = async (req, res) => {
     let media_url = "";
     let message_type = image ? "image" : "text";
     if (message_type === "image") {
-      media_url = await uploadImageOnImageKit(image, "Messages-Media", 1280);
+      media_url = await uploadImageOnImageKit(image, "Messages_Media", 1280);
     }
 
     const message = await Message.create({

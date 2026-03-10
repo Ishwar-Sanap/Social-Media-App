@@ -37,13 +37,13 @@ export const editUserProfile = async (req, res) => {
 
     //Profile and Cover image files parse through multer middleware
     const profileImg =
-      req.files.profile_picture && req.files.profile_picture[0];
-    const coverImg = req.files.cover_photo && req.files.cover_photo[0];
+      req.files?.profile_picture && req.files.profile_picture[0];
+    const coverImg = req.files?.cover_photo && req.files.cover_photo[0];
 
     if (profileImg) {
       const imgUrl = await uploadImageOnImageKit(
         profileImg,
-        "Profile Pics",
+        "Profile_Pics",
         512,
       );
       loggedInUser.profile_picture = imgUrl;
@@ -51,7 +51,7 @@ export const editUserProfile = async (req, res) => {
     if (coverImg) {
       const imgUrl = await uploadImageOnImageKit(
         coverImg,
-        "Cover Photos",
+        "Cover_Photos",
         1280,
       );
       loggedInUser.cover_photo = imgUrl;
