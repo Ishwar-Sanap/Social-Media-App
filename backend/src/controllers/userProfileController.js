@@ -90,7 +90,7 @@ export const discoverUsersProfile = async (req, res) => {
       ],
     });
     const message = `Number of users found ${allUsers.length}`;
-    res.json({ status: true, data: allUsers, message });
+    res.json({ success: true, data: allUsers, message });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }
@@ -119,7 +119,7 @@ export const followUser = async (req, res) => {
 
     const message = `You are now following '${toUser.full_name}'`;
 
-    res.json({ status: true, message });
+    res.json({ success: true, message });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }
@@ -141,19 +141,19 @@ export const unFollowUser = async (req, res) => {
 
     // A Unfollow B
     loggedInUser.following = loggedInUser.following.filter(
-      (id) => id !== userId,
+      (id) => id.toString() !== userId,
     );
     await loggedInUser.save();
 
     // A is not Followers of B
     toUser.followers = toUser.followers.filter(
-      (id) => id !== loggedInUser._id.toString(),
+      (id) => id.toString() !== loggedInUser._id.toString(),
     );
     await toUser.save();
 
     const message = `You are no longer following '${toUser.full_name}'`;
 
-    res.json({ status: true, message });
+    res.json({ success: true, message });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }
@@ -184,7 +184,7 @@ export const removeFollower = async (req, res) => {
     await toUser.save();
 
     res.json({
-      status: true,
+      success: true,
       message: `Successfully removed follower '${toUser.full_name}'`,
     });
   } catch (error) {

@@ -39,4 +39,6 @@
     type: "module" is added in package.json to enable this feature
   - express.json() middleware is used to parse incoming JSON payloads in request and sending JSON responses back to the client. It allows us to easily handle JSON data in our API endpoints.
 - JWT (JSON Web Tokens) is used for user authentication and authorization in the application. It allows us to securely transmit information between the client and server in protected routes and manage user sessions effectively.
-- Sheduling background tasks using node-cron to perform periodic operations such as sending notifications, deleting old user stories data , or performing maintenance tasks at specified intervals.
+- While comparing the object _id from MongoDB with userId that we get from req.body or req.params, we are using the .toString() method to convert the ObjectId to a string before comparing it with the userId. 
+  This is necessary because the ObjectId is a special type in MongoDB and needs to be converted to a string for accurate comparison.
+- Scheduling background tasks using node-cron to perform periodic operations such as sending notifications, deleting old user stories data , or performing maintenance tasks at specified intervals.
