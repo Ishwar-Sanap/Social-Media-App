@@ -9,9 +9,22 @@ import {
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import ActionConfirmPopup from "../components/ActionConfirmPopup";
-import { fetchConnectionsData } from "../api/connectionsService";
+import {
+  acceptConnectionRequest,
+  fetchConnectionsData,
+  rejectConnectionRequest,
+  removeConnection,
+} from "../api/connectionsService";
 import Loading from "../components/Loading";
 import ErrorComponent from "../components/ErrorComponent";
+import {
+  fetchProfileDetails,
+  removeFollower,
+  unFollowUser,
+} from "../api/profileService";
+import { useDispatch, useSelector } from "react-redux";
+import toast from "react-hot-toast";
+import { addUser } from "../store/userSlice";
 
 const Connections = () => {
   const navigate = useNavigate();
@@ -20,6 +33,8 @@ const Connections = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [connectionsData, setConnectionsData] = useState(null);
   const [error, setError] = useState(false);
+  const loggedInUser = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
   const getConnectionsData = async () => {
     setError(false);
@@ -35,15 +50,42 @@ const Connections = () => {
 
   useEffect(() => {
     getConnectionsData();
-  }, []);
+  }, [loggedInUser]);
 
   const handleRemoveClick = (userToRemove) => {
     setSelectedUser(userToRemove);
     setShowConfirmModal(true);
   };
 
-  const handleConfirmRemove = () => {
+  const handleConfirmRemove = async () => {
     // Call remove follower API here with selectedUserId
+    try {
+      let resp = null;
+      if (currTab === "Followers")
+        resp = await removeFollower(selectedUser._id);
+      else if (currTab === "Pending")
+        resp = await rejectConnectionRequest(selectedUser._id);
+      else if (currTab === "Connections")
+        resp = await removeConnection(selectedUser._id);
+
+      if (!resp) {
+        setShowConfirmModal(false);
+        return;
+      }
+
+      if (resp.data.success) {
+        toast.success(resp.data.message);
+        //after removing the follower get new user details and update in store.
+        const profileDetailsResp = await fetchProfileDetails(loggedInUser._id);
+        dispatch(addUser(profileDetailsResp.data?.profile));
+      } else {
+        toast.error(resp.data.message);
+      }
+    } catch (error) {
+      if (error?.response?.data?.message)
+        toast.error(error.response.data.message);
+      else toast.error(error.customMessage);
+    }
     setShowConfirmModal(false);
   };
 
@@ -52,6 +94,40 @@ const Connections = () => {
     setSelectedUser(null);
   };
 
+  const handleUnfollowUser = async (userId) => {
+    try {
+      const resp = await unFollowUser(userId);
+      if (resp.data.success) {
+        toast.success(resp.data.message);
+        //after Unfollowing the user get new user details and update in store.
+        const profileDetailsResp = await fetchProfileDetails(loggedInUser._id);
+        dispatch(addUser(profileDetailsResp.data?.profile));
+      } else {
+        toast.error(resp.data.message);
+      }
+    } catch (error) {
+      if (error?.response?.data?.message)
+        toast.error(error.response.data.message);
+      else toast.error(error.customMessage);
+    }
+  };
+  const handleAcceptConnecion = async (userId) => {
+    try {
+      const resp = await acceptConnectionRequest(userId);
+      if (resp.data.success) {
+        toast.success(resp.data.message);
+        //after Unfollowing the user get new user details and update in store.
+        const profileDetailsResp = await fetchProfileDetails(loggedInUser._id);
+        dispatch(addUser(profileDetailsResp.data?.profile));
+      } else {
+        toast.error(resp.data.message);
+      }
+    } catch (error) {
+      if (error?.response?.data?.message)
+        toast.error(error.response.data.message);
+      else toast.error(error.customMessage);
+    }
+  };
   if (error) return <ErrorComponent onRetry={getConnectionsData} />;
 
   if (!connectionsData) return <Loading />;
@@ -163,6 +239,7 @@ const Connections = () => {
                     )}
                     {currTab === "Following" && (
                       <button
+                        onClick={() => handleUnfollowUser(user._id)}
                         className="w-full p-2 text-sm rounded bg-slate-100 dark:bg-slate-300 hover:bg-slate-200 text-black
                       active: scale-95 transition cursor-pointer"
                       >
@@ -172,6 +249,7 @@ const Connections = () => {
                     {currTab === "Pending" && (
                       <div className="flex gap-1">
                         <button
+                        onClick={()=>handleAcceptConnecion(user._id)}
                           className="w-full p-2 text-sm rounded bg-slate-100 dark:bg-slate-300 hover:bg-green-400 text-black
                       active: scale-95 transition cursor-pointer"
                         >

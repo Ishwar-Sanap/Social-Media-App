@@ -5,22 +5,33 @@ import StoriesBar from "../components/StoriesBar";
 import PostCard from "../components/PostCard";
 import RecentMessages from "../components/RecentMessages";
 import { fetchFeedData } from "../api/userPostsService";
+import ErrorComponent from "../components/ErrorComponent";
 
 const Feed = () => {
   const [feeds, setFeeds] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   const getFeedData = async () => {
+    setError(false)
+    setLoading(true)
     try {
       const resp = await fetchFeedData();
       setFeeds(resp.data?.posts);
       setLoading(false);
-    } catch (error) {}
+    } catch (error) {
+      setTimeout(() => {
+        setLoading(false)
+        setError(true);
+      }, 1000);
+    }
   };
 
   useEffect(() => {
     getFeedData();
   }, []);
+
+  if(error) return <ErrorComponent onRetry={getFeedData}/>
 
   return !loading ? (
     <div className="h-full overflow-y-scroll no-scrollbar py-10 xl:pr-5 flex items-start justify-center xl:gap-8">

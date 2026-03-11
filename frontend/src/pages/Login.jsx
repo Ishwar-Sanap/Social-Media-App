@@ -8,7 +8,6 @@ import { isValidEmail } from "../utils/inputValidations";
 import { toast } from "react-hot-toast";
 const Login = () => {
   const [showLoginForm, setShowLoginForm] = useState(true);
-  const [errorMsg, setErrorMsg] = useState(null);
   const dispatch = useDispatch();
 
   const handleSubmit = (e) => {
@@ -29,16 +28,15 @@ const Login = () => {
           } else {
             res = await loginUser({ username: email, password });
           }
-          if (res.success) {
+          if (res.data.success) {
             toast.success("Login successfully.");
           } else {
-            toast.error(res.message);
+            toast.error(res.data.message);
           }
           dispatch(addUser(res.data?.user));
         } catch (error) {
           if (error?.response?.data?.message)
             toast.error(error.response.data.message);
-          
           else toast.error(error.customMessage);
         }
       }
@@ -57,18 +55,21 @@ const Login = () => {
             email,
             password,
           });
+          if (res.data.success) {
+            toast.success("Signup successfully.");
+          } else {
+            toast.error(res.data.message);
+          }
           dispatch(addUser(res.data?.user));
-        } catch (err) {
-          setErrorMsg(err.response.data?.message);
+        } catch (error) {
+          if (error?.response?.data?.message)
+            toast.error(error.response.data.message);
+          else toast.error(error.customMessage);
         }
       }
 
       signupNewUser();
     }
-  };
-
-  const handleChange = (e) => {
-    setErrorMsg(null);
   };
 
   return (
@@ -114,7 +115,6 @@ const Login = () => {
       {/* Right side: Login or Signup form */}
       <div className="flex-1 flex items-center justify-center p-6 sm:p-10">
         <form
-          onChange={handleChange}
           onSubmit={handleSubmit}
           className="flex flex-col bg-slate-100 dark:bg-slate-800 rounded-2xl shadow-lg p-8 w-full max-w-sm gap-2"
         >
@@ -192,8 +192,6 @@ const Login = () => {
             className="border border-slate-300 rounded-lg px-4 py-2.5 text-md text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition mb-4"
           />
 
-          {/* Show Error Message */}
-          {errorMsg && <p className="text-red-500">Error : {errorMsg}</p>}
           <button
             type="submit"
             className="py-2.5 rounded-lg bg-linear-to-r from-indigo-500 to-purple-600 hover:from-indio-700 hover:to-indigo-800 active:scale-95 transition text-white cursor-pointer shadow-md"

@@ -5,3 +5,5 @@ export const fetchProfileDetails = (profileId) => API.get(`/profile/details/${pr
 export const discoverProfileDetails = (searchText) => API.get(`/profile/discover/?search=${searchText}`)
 export const saveProfileDetails = (data) => API.patch("/profile/edit" ,data)
 export const followUser = (userId) => API.post("/profile/follow/"+userId)
+export const unFollowUser = (userId) => API.post("/profile/unfollow/"+userId)
+export const removeFollower = (userId) => API.post("/profile/remove/follower/"+userId)

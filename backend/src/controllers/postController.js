@@ -38,7 +38,7 @@ export const getFeedPosts = async (req, res) => {
     const userIds = [
       loggedInUser._id,
       ...loggedInUser.connections,
-      ...loggedInUser.followers,
+      ...loggedInUser.following,
     ];
 
     const posts = await Post.find({ user: { $in: userIds } })

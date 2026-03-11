@@ -13,7 +13,6 @@ const UserCard = ({ user }) => {
   const dispatch = useDispatch();
 
   const handleFollowUser = async () => {
-    console.log("make call to follow user");
     try {
       const resp = await followUser(user._id);
       if (resp.data.success) {
