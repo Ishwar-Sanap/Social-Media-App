@@ -1,13 +1,58 @@
 import { MapPin, MessageCircle, Plus, UserPlus } from "lucide-react";
 import React from "react";
-import { dummyUserData } from "../assets/assets";
 import { useNavigate } from "react-router";
-import {useSelector} from 'react-redux'
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProfileDetails, followUser } from "../api/profileService";
+import toast from "react-hot-toast";
+import { addUser } from "../store/userSlice";
+import { sendConnectionRequest } from "../api/connectionsService";
 
 const UserCard = ({ user }) => {
-  
-  const loggedInUser = useSelector(state=> state.user);
+  const loggedInUser = useSelector((state) => state.user);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleFollowUser = async () => {
+    console.log("make call to follow user");
+    try {
+      const resp = await followUser(user._id);
+      if (resp.data.success) {
+        toast.success(resp.data.message);
+        //after following the user get new user details and update in store.
+        const profileDetailsResp = await fetchProfileDetails(loggedInUser._id);
+        dispatch(addUser(profileDetailsResp.data?.profile));
+      } else {
+        toast.error(resp.data.message);
+      }
+    } catch (error) {
+      if (error?.response?.data?.message)
+        toast.error(error.response.data.message);
+      else toast.error(error.customMessage);
+    }
+  };
+
+  const handleSendConnection = async () => {
+    if (loggedInUser?.connections.includes(user._id)) {
+      navigate(`/messages/${loggedInUser._id}`);
+      return;
+    }
+
+    try {
+      const resp = await sendConnectionRequest(user._id);
+      if (resp.data.success) {
+        toast.success(resp.data.message);
+        //after sending the request to user get new user details and update in store.
+        const profileDetailsResp = await fetchProfileDetails(loggedInUser._id);
+        dispatch(addUser(profileDetailsResp.data?.profile));
+      } else {
+        toast.error(resp.data.message);
+      }
+    } catch (error) {
+      if (error?.response?.data?.message)
+        toast.error(error.response.data.message);
+      else toast.error(error.customMessage);
+    }
+  };
   return (
     <div
       key={user._id}
@@ -20,7 +65,7 @@ const UserCard = ({ user }) => {
           src={user.profile_picture}
           alt=""
           className="rounded-full w-16 shadow-md mx-auto cursor-pointer"
-          onClick={()=> navigate(`/profile/${user._id}`)}
+          onClick={() => navigate(`/profile/${user._id}`)}
         />
         <p className="mt-4 font-semibold text-slate-800 dark:text-slate-100">
           {user.full_name}
@@ -30,7 +75,7 @@ const UserCard = ({ user }) => {
         )}
         {user.bio && (
           <p className="text-gray-600 dark:text-slate-400 mt-2 text-center text-sm px-4">
-            {user.bio}
+            {user.bio.slice(0, 30) + "..."}
           </p>
         )}
       </div>
@@ -50,6 +95,7 @@ const UserCard = ({ user }) => {
         {/* Follow button */}
         <button
           disabled={loggedInUser?.following.includes(user._id)}
+          onClick={handleFollowUser}
           className="w-2/3 py-2 rounded-md flex items-center justify-center gap-2  bg-linear-to-r from-indigo-500 to-purple-600 
           hover:from-indio-700 hover:to-indigo-800 active:scale-95 transition text-white cursor-pointer "
         >
@@ -60,11 +106,7 @@ const UserCard = ({ user }) => {
         {/* Connection request button */}
 
         <button
-          onClick={() =>
-            loggedInUser?.connections.includes(user._id)
-              ? navigate(`/messages/${loggedInUser._id}`)
-              : null
-          }
+          onClick={handleSendConnection}
           className="flex items-center justify-center w-1/3 border rounded-md border-gray-300 dark:border-gray-700 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer "
         >
           {loggedInUser?.connections.includes(user._id) ? (

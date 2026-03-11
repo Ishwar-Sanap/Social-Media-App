@@ -14,17 +14,17 @@ API.interceptors.response.use(
     if (error.response) {
       // Server responded with error status
       if (error.response.status === 401) {
-        console.error("Unauthorized user. Please login!");
+        error.customMessage = "Unauthorized user, Please login!";
       }
 
       if (error.response.status === 500) {
-        console.error("Server error");
+        error.customMessage = "Server error";
       }
     } else if (error.request) {
       // Request sent but no response
-      console.error("Network error. Server not responding.");
+      error.customMessage = "Network error, server not responding";
     } else {
-      console.error("Error:", error.message);
+      error.customMessage = error.message;
     }
     return Promise.reject(error);
   },

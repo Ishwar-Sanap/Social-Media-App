@@ -37,10 +37,16 @@ export const sendConnectionRequest = async (req, res) => {
     if (existConnection && existConnection.status === "accepted")
       throw new Error(`You are already connected to '${toUser.full_name}'`);
 
-    if (existConnection && existConnection.status === "pending")
-      throw new Error(
-        `You have already pending connection request with '${toUser.full_name}'`,
-      );
+    if (existConnection && existConnection.status === "pending") {
+      if (existConnection.from_user_id.equals(loggedInUser._id))
+        throw new Error(
+          `You have already sent connection request to '${toUser.full_name}'`,
+        );
+      else
+        throw new Error(
+          `You have already pending connection request from '${toUser.full_name}'`,
+        );
+    }
 
     const connReq = await Connection.create({
       from_user_id: loggedInUser._id,
@@ -160,7 +166,6 @@ export const rejectConnectionRequest = async (req, res) => {
       success: true,
       message: "Connection request rejected successfully",
     });
-
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }

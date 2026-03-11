@@ -5,7 +5,7 @@ import { loginUser, signupUser } from "../api/userAuthService";
 import { useDispatch } from "react-redux";
 import { addUser } from "../store/userSlice";
 import { isValidEmail } from "../utils/inputValidations";
-
+import { toast } from "react-hot-toast";
 const Login = () => {
   const [showLoginForm, setShowLoginForm] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -29,9 +29,17 @@ const Login = () => {
           } else {
             res = await loginUser({ username: email, password });
           }
+          if (res.success) {
+            toast.success("Login successfully.");
+          } else {
+            toast.error(res.message);
+          }
           dispatch(addUser(res.data?.user));
-        } catch (err) {
-          setErrorMsg(err.response.data?.message);
+        } catch (error) {
+          if (error?.response?.data?.message)
+            toast.error(error.response.data.message);
+          
+          else toast.error(error.customMessage);
         }
       }
 

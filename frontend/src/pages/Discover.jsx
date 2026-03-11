@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import UserCard from "../components/UserCard";
 import Loading from "../components/Loading";
 import { discoverProfileDetails } from "../api/profileService";
-
+import { toast } from "react-hot-toast";
 const Discover = () => {
   const [input, setInput] = useState("");
   const [users, setUsers] = useState([]);
@@ -18,6 +18,7 @@ const Discover = () => {
         setUsers(resp.data?.data);
         setLoading(false);
       } catch (error) {
+        toast.error(error.message)
         setError(true);
       }
     }
