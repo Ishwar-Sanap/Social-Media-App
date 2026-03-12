@@ -8,13 +8,15 @@ import {
 } from "lucide-react";
 import moment from "moment";
 import React, { useState } from "react";
-import { dummyUserData } from "../assets/assets";
 import { useNavigate } from "react-router";
-import { useRef } from "react";
-import { useEffect } from "react";
 import ActionConfirmPopup from "./ActionConfirmPopup";
-const PostCard = ({ post, profileId, displyOnProfile, isOpen, onToggle }) => {
-  const postWithHashtags = post.content.replace(
+import { deletePost, likePost } from "../api/userPostsService";
+import { useDispatch, useSelector } from "react-redux";
+import toast from "react-hot-toast";
+import { updatePostLike } from "../store/feedPostsSlice";
+import { deleteUserPost, updateUserPostLike } from "../store/userPostsSlice";
+const PostCard = ({ post, displyOnProfile, isOpen, onToggle }) => {
+  const postWithHashtags = post.content?.replace(
     /(#\w+)/g,
     '<span class="text-indigo-600 dark:text-indigo-400"> $1  </span>',
   );
@@ -22,14 +24,23 @@ const PostCard = ({ post, profileId, displyOnProfile, isOpen, onToggle }) => {
   //post.content -->  This is a sample paragraph with some #hashtags like #socialmedia and #marketing. Let's find them!
   // postWithHashtags --> This is a sample paragraph with some <span class="text-indigo-600"> #hashtags  </span> like <span class="text-indigo-600"> #socialmedia  </span> and <span class="text-indigo-600"> #marketing  </span>. Let's find them!
 
-  const [likes, setLikes] = useState(post.likes_count);
-  const[showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-  const currentUser = dummyUserData;
+  const currentUser = useSelector((state) => state.user);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const handleConfirmRemove = () => {
+  const handleConfirmRemove = async () => {
     // Call remove Post API here to remove post._id
+    try {
+      const resp = await deletePost(post._id);
+      if (resp.data.success) {
+        toast.success(resp.data.message);
+        dispatch(deleteUserPost({ postId: post._id }));
+      }
+    } catch (error) {
+      toast.error("Failed to delete post");
+    }
     setShowConfirmModal(false);
   };
 
@@ -38,7 +49,23 @@ const PostCard = ({ post, profileId, displyOnProfile, isOpen, onToggle }) => {
     onToggle();
   };
 
-  const handleLike = async () => {};
+  const handleLike = async () => {
+    try {
+      const resp = await likePost(post._id);
+      if (resp.data.success) {
+        toast.success(resp.data.message);
+
+        dispatch(updatePostLike({ postId: post._id, userId: currentUser._id }));
+
+        dispatch(
+          updateUserPostLike({ postId: post._id, userId: currentUser._id }),
+        );
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
   return (
     <div className="bg-white dark:bg-slate-900 rounded-xl shadow p-4 space-y-4 w-full max-w-2xl">
       {/* User Info */}
@@ -66,10 +93,7 @@ const PostCard = ({ post, profileId, displyOnProfile, isOpen, onToggle }) => {
         </div>
 
         {/* When PostCard is loaded from Profile page and user is loogedIn user then only show Remove post option*/}
-        {/* {displyOnProfile && post.user._id === currentUser._id && <div>Remove</div>} TODO - use when actual data is there */}
-        {/*For Dummy data only, It will be remove later */}
-
-        {displyOnProfile && !profileId && (
+        {displyOnProfile && post.user._id === currentUser._id && (
           <div className="relative">
             <div
               className="w-5 h-8 flex justify-center items-center hover:cursor-pointer"
@@ -119,11 +143,12 @@ const PostCard = ({ post, profileId, displyOnProfile, isOpen, onToggle }) => {
         <div className="flex items-center gap-1">
           <Heart
             className={`w-4 h-4 cursor-pointer ${
-              likes.includes(currentUser._id) && "text-red-500 fill-red-500"
+              post.likes_count.includes(currentUser._id) &&
+              "text-red-500 fill-red-500"
             } `}
             onClick={handleLike}
           />
-          <span>{likes.length}</span>
+          <span>{post.likes_count.length}</span>
         </div>
 
         <div className="flex items-center gap-1">

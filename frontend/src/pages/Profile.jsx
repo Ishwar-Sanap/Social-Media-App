@@ -6,18 +6,21 @@ import PostCard from "../components/PostCard";
 import moment from "moment";
 import ProfileModal from "../components/ProfileModal";
 import { fetchProfileDetails } from "../api/profileService";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import ErrorComponent from "../components/ErrorComponent";
+import { setUserPosts } from "../store/userPostsSlice";
 
 const Profile = () => {
   const { profileId } = useParams();
   const [userFromResponse, setUserFromResponse] = useState(null);
-  const [posts, setPosts] = useState([]);
   const [activeTab, setActiveTab] = useState("posts");
   const [showEdit, setShowEdit] = useState(false);
   const [openDropDown, setOpenDropDown] = useState(null);
   const [error, setError] = useState(false);
   const loggedInUser = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+
+  const posts = useSelector((state) => state.userPosts.posts);
 
   const toggleDropDown = (id) => {
     setOpenDropDown(openDropDown === id ? null : id);
@@ -30,7 +33,7 @@ const Profile = () => {
 
       if (profileId) setUserFromResponse(resp.data?.profile);
 
-      setPosts(resp.data?.posts);
+      dispatch(setUserPosts(resp.data?.posts));
     } catch (error) {
       setError(true);
     }
@@ -39,6 +42,7 @@ const Profile = () => {
   useEffect(() => {
     getUserProfileDetails();
   }, []);
+
 
   if (error)
     return (

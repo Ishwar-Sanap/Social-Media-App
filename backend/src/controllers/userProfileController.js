@@ -18,7 +18,7 @@ export const getProfileDetails = async (req, res) => {
     const userProfile = await User.findById(userId);
     if (!userProfile) throw new Error("User not found");
 
-    const posts = await Post.find({ user: userProfile._id });
+    const posts = await Post.find({ user: userProfile._id }).sort({ createdAt: -1 });;
     res.json({ success: true, profile: userProfile, posts });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });

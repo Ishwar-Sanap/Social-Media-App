@@ -1,5 +1,5 @@
 import Post from "../models/Post.js";
-import {uploadImageOnImageKit} from "../utils/uploadOnImageKit.js";
+import { uploadImageOnImageKit } from "../utils/uploadOnImageKit.js";
 
 export const createPost = async (req, res) => {
   try {
@@ -8,8 +8,7 @@ export const createPost = async (req, res) => {
     const images = req.files; // images will be in files, that are parsed by multer
 
     let image_urls = [];
-
-    if (images.length) {
+    if (images?.length) {
       image_urls = await Promise.all(
         images.map(async (image) => {
           const imgUrl = await uploadImageOnImageKit(image, "Posts", 1280);
@@ -17,11 +16,19 @@ export const createPost = async (req, res) => {
         }),
       );
     }
+    const data = {};
+    if (post_type === "text_with_image") {
+      data.content = content;
+      data.image_urls = image_urls;
+    } else if (post_type === "image") {
+      data.image_urls = image_urls;
+    } else if (post_type === "text") {
+      data.content = content;
+    }
     await Post.create({
       user: loggedInUser._id,
-      content,
-      image_urls,
       post_type,
+      ...data,
     });
 
     res.json({ success: true, message: "Post created successfully" });
@@ -82,7 +89,7 @@ export const deletePost = async (req, res) => {
   try {
     const loggedInUser = req.user;
     const { postId } = req.params;
-  
+
     const post = await Post.findOneAndDelete({
       _id: postId,
       user: loggedInUser._id,

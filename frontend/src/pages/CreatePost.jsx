@@ -2,16 +2,50 @@ import React, { useState } from "react";
 import { dummyUserData } from "../assets/assets";
 import { X, Image } from "lucide-react";
 import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
+import { createPost } from "../api/userPostsService";
+import { useNavigate } from "react-router";
 
 const CreatePost = () => {
   const [content, setContent] = useState("");
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const user = useSelector((state) => state.user);
 
-  const user = dummyUserData;
   const handleSubmit = async () => {
-    
-  }
+    const formData = new FormData();
+    const tostId = toast.loading("Uploading...");
+
+    if (content.length > 0 && images.length > 0) {
+      formData.append("post_type", "text_with_image");
+      formData.append("content", content);
+      images.forEach((image) => formData.append("images", image));
+    } else if (content.length > 0) {
+      formData.append("post_type", "text");
+      formData.append("content", content);
+    } else if (images.length > 0) {
+      formData.append("post_type", "image");
+      images.forEach((image) => formData.append("images", image));
+    } else {
+      toast.error("Please add content !", { id: tostId });
+      return;
+    }
+
+    try {
+      const resp = await createPost(formData);
+      if (resp.data?.success) {
+        toast.success("Post Added", { id: tostId });
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
+      }
+    } catch (error) {
+      if (error?.response?.data.message)
+        toast.error(error?.response?.data.message, { id: tostId });
+      else toast.error("Failed to upload post", { id: tostId });
+    }
+  };
 
   return (
     <div className="h-full overflow-y-scroll no-scrollbar bg-slate-100 dark:bg-slate-800 ">
@@ -36,7 +70,9 @@ const CreatePost = () => {
               className="w-12 h-12 rounded-full shadow"
             />
             <div>
-              <h2 className="font-semibold text-slate-800 dark:text-slate-100 ">{user.full_name}</h2>
+              <h2 className="font-semibold text-slate-800 dark:text-slate-100 ">
+                {user.full_name}
+              </h2>
               <p className="text-sm text-gray-500">@{user.username}</p>
             </div>
           </div>
@@ -91,14 +127,9 @@ const CreatePost = () => {
               onChange={(e) => setImages([...images, ...e.target.files])}
             />
 
-            <button disabled={loading}
-              onClick={() =>
-                toast.promise(handleSubmit(), {
-                  loading: "uploading...",
-                  success: <p>Post Added</p>,
-                  error: <p>Post Not Added</p>,
-                })
-              }
+            <button
+              disabled={loading}
+              onClick={handleSubmit}
               className="text-sm px-8 py-2 rounded-md bg-linear-to-r from-indigo-500 to-purple-600 
           hover:from-indio-600 hover:to-indigo-700 active:scale-95 transition text-white font-medium cursor-pointer"
             >

@@ -6,22 +6,25 @@ import PostCard from "../components/PostCard";
 import RecentMessages from "../components/RecentMessages";
 import { fetchFeedData } from "../api/userPostsService";
 import ErrorComponent from "../components/ErrorComponent";
+import { useDispatch, useSelector } from "react-redux";
+import { setPosts } from "../store/feedPostsSlice";
 
 const Feed = () => {
-  const [feeds, setFeeds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-
+  const dispatch = useDispatch();
+  const feeds = useSelector((state) => state.feedPosts.posts);
+ 
   const getFeedData = async () => {
-    setError(false)
-    setLoading(true)
+    setError(false);
+    setLoading(true);
     try {
       const resp = await fetchFeedData();
-      setFeeds(resp.data?.posts);
+      dispatch(setPosts(resp.data?.posts));
       setLoading(false);
     } catch (error) {
       setTimeout(() => {
-        setLoading(false)
+        setLoading(false);
         setError(true);
       }, 1000);
     }
@@ -31,13 +34,14 @@ const Feed = () => {
     getFeedData();
   }, []);
 
-  if(error) return <ErrorComponent onRetry={getFeedData}/>
+  if (error) return <ErrorComponent onRetry={getFeedData} />;
 
   return !loading ? (
     <div className="h-full overflow-y-scroll no-scrollbar py-10 xl:pr-5 flex items-start justify-center xl:gap-8">
       {/* Stories and post list */}
       <div>
         <StoriesBar />
+        
         <div className="p-4 space-y-6">
           {feeds.map((post) => (
             <PostCard key={post._id} post={post} />
