@@ -4,13 +4,21 @@ import { Plus } from "lucide-react";
 import moment from "moment";
 import StoryModal from "./StoryModal";
 import StoryViewer from "./StoryViewer";
+import { getStories } from "../api/storyService";
 
 const StoriesBar = () => {
   const [stories, setStories] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [viewStory, setViewStory] = useState(null);
   const fetchStories = async () => {
-    setStories(dummyStoriesData);
+    try {
+      const resp = await getStories();
+      if (resp?.data?.success) {
+        setStories(resp.data?.stories);
+      }
+    } catch (error) {}
+
+    setStories(dummyStoriesData)
   };
 
   useEffect(() => {

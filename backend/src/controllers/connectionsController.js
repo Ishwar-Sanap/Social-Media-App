@@ -85,7 +85,7 @@ export const getUserConnections = async (req, res) => {
     const userConnections = await Connection.find({
       to_user_id: loggedInUser._id,
       status: "pending",
-    }).populate("from_user_id");
+    }).populate("from_user_id").sort({createdAt : -1});
 
     const pendingConnections = userConnections.map(
       (connection) => connection.from_user_id,

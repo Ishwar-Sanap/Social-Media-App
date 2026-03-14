@@ -67,6 +67,7 @@ const ProfileModal = ({ setShowEdit }) => {
 
       setTimeout(() => {
         toast.success("Profile details updated!", { id: tostId });
+        setShowEdit(false);
       }, [1000]);
     } catch (error) {
       setError(error.response?.data?.message);

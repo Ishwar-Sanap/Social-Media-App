@@ -167,7 +167,6 @@ export const removeFollower = async (req, res) => {
     if (!loggedInUser.followers.includes(userId))
       throw new Error("This User is not your follower");
 
-    console.log(loggedInUser.followers);
 
     loggedInUser.followers = loggedInUser.followers.filter(
       (uid) => uid.toString() !== userId,

@@ -116,7 +116,7 @@ const Connections = () => {
       const resp = await acceptConnectionRequest(userId);
       if (resp.data.success) {
         toast.success(resp.data.message);
-        //after Unfollowing the user get new user details and update in store.
+        //after accepting the request new user details update in store.
         const profileDetailsResp = await fetchProfileDetails(loggedInUser._id);
         dispatch(addUser(profileDetailsResp.data?.profile));
       } else {
