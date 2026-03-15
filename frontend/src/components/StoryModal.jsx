@@ -1,6 +1,7 @@
 import { ArrowLeft, Sparkle, TextIcon, Upload } from "lucide-react";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
+import { createStory } from "../api/storyService";
 
 const StoryModal = ({ setShowModal, fetchStories }) => {
   const bgColors = [
@@ -26,10 +27,53 @@ const StoryModal = ({ setShowModal, fetchStories }) => {
     }
   };
 
-  const handleCreateStory = async () => {};
+  const handleCreateStory = async () => {
+    const tostId = toast.loading("Uploading story...");
+    try {
+      const formData = new FormData();
+      let media_type = "";
+      if (mode === "media" && media?.type.startsWith("image")) {
+        media_type = "image";
+      } else if (mode === "media" && media?.type.startsWith("video")) {
+        media_type = "video";
+      } else {
+        media_type = "text";
+
+        if (text.length > 0) formData.append("content", text);
+        else {
+          toast.error("Please add text or media", { id: tostId });
+          return;
+        }
+      }
+
+      if (mode === "media") formData.append("media", media);
+
+      formData.append("media_type", media_type);
+      formData.append("background_color", background);
+
+      const resp = await createStory(formData);
+
+      if (resp.data?.success) {
+        fetchStories(); // getting new stories
+        setTimeout(() => {
+          toast.success("Story added", { id: tostId });
+        }, 1000);
+
+        setShowModal(false);
+      }
+    } catch (error) {
+      toast.error("Failed to add story!", { id: tostId });
+    }
+  };
   return (
     <div className="fixed inset-0 z-110 min-h-screen bg-black/80 backdrop-blur text-white flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+      <div
+        style={{
+          width: "min(400px, 92vw)",
+          aspectRatio: "9/16",
+          maxHeight: "90vh",
+        }}
+      >
         <div className="text-center mb-4 flex items-center justify-between">
           <button
             onClick={() => setShowModal(false)}
@@ -63,7 +107,7 @@ const StoryModal = ({ setShowModal, fetchStories }) => {
                 className="object-contain max-h-full"
               />
             ) : (
-              <video src={previewUrl} className="object-contain max-h-full" />
+              <video src={previewUrl} className="object-contain max-h-full" autoPlay controls />
             ))}
         </div>
 
@@ -109,13 +153,7 @@ const StoryModal = ({ setShowModal, fetchStories }) => {
         </div>
 
         <button
-          onClick={() =>
-            toast.promise(handleCreateStory(), {
-              loading: "saving...",
-              success: <p>Story Added</p>,
-              error: (e) => <p>{e.message}</p>,
-            })
-          }
+          onClick={handleCreateStory}
           className="flex items-center justify-center gap-2 text-white
             py-3 mt-4 w-full rounded bg-linear-to-r from-indigo-500 to-purple-600
             hover:from-indigo-600 hover:to-purple-700 active: scale-95 transition

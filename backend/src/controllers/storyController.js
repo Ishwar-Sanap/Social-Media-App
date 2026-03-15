@@ -31,7 +31,7 @@ export const addUserStory = async (req, res) => {
 export const getStories = async (req, res) => {
   try {
     const loggedInUser = req.user;
-
+    const selectedUserDetails = "full_name username profile_picture";
     //User can see Stories from loggedInuser,  connected  or following users on Feed
     const userIds = [
       loggedInUser._id,
@@ -40,12 +40,35 @@ export const getStories = async (req, res) => {
     ];
 
     const stories = await Story.find({ user: { $in: userIds } })
-      .populate("user")
+      .populate("user", selectedUserDetails)
       .sort({ createdAt: -1 }); // sort in descending order of createdAt (newest story first)
 
     if (stories.length === 0) throw new Error("No stories found");
 
-    res.json({ success: true, stories });
+    //Find all oweners of each stories
+
+    // {userId1 : [{}, {}, {}] , userId2 : [{}, {}, {}]}
+    const userStoriesMap = {};
+    const userDetailsMap = {};
+    stories.map((story) => {
+      const userId = story.user._id;
+      const { user, ...storyData } = story.toObject(); //convert into plain js object
+      if (userStoriesMap[userId]) {
+        userStoriesMap[userId].push(storyData);
+      } else {
+        userStoriesMap[userId] = [storyData];
+      }
+      userDetailsMap[userId] = user;
+    });
+
+    const data = [];
+
+    Object.keys(userStoriesMap).forEach((userId) => {
+      const stories = userStoriesMap[userId];
+      data.push({ ...userDetailsMap[userId], stories });
+    });
+
+    res.json({ success: true, data });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }

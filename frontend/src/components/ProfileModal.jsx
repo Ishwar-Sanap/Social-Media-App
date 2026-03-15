@@ -71,7 +71,6 @@ const ProfileModal = ({ setShowEdit }) => {
       }, [1000]);
     } catch (error) {
       setError(error.response?.data?.message);
-      console.log(error.response?.data?.message);
       toast.error("Failed to save data!", { id: tostId });
     }
   };

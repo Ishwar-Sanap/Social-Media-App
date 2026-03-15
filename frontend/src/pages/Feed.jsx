@@ -8,13 +8,14 @@ import { fetchFeedData } from "../api/userPostsService";
 import ErrorComponent from "../components/ErrorComponent";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "../store/feedPostsSlice";
+import StoryFeed from "../components/StoryFeed";
 
 const Feed = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const dispatch = useDispatch();
   const feeds = useSelector((state) => state.feedPosts.posts);
- 
+
   const getFeedData = async () => {
     setError(false);
     setLoading(true);
@@ -40,8 +41,7 @@ const Feed = () => {
     <div className="h-full overflow-y-scroll no-scrollbar py-10 xl:pr-5 flex items-start justify-center xl:gap-8">
       {/* Stories and post list */}
       <div>
-        <StoriesBar />
-        
+        <StoryFeed/> 
         <div className="p-4 space-y-6">
           {feeds.map((post) => (
             <PostCard key={post._id} post={post} />
