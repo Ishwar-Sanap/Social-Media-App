@@ -1,5 +1,5 @@
 import { ArrowLeft, Sparkle, TextIcon, Upload } from "lucide-react";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { createStory } from "../api/storyService";
 
@@ -18,7 +18,7 @@ const StoryModal = ({ setShowModal, fetchStories }) => {
   const [text, setText] = useState("");
   const [media, setMedia] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
-
+  const videoRef = useRef(null);
   const handleMediaUpload = (e) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -39,7 +39,7 @@ const StoryModal = ({ setShowModal, fetchStories }) => {
       } else {
         media_type = "text";
 
-        if (text.length > 0) formData.append("content", text);
+        if (text.trim().length > 0) formData.append("content", text);
         else {
           toast.error("Please add text or media", { id: tostId });
           return;
@@ -51,18 +51,28 @@ const StoryModal = ({ setShowModal, fetchStories }) => {
       formData.append("media_type", media_type);
       formData.append("background_color", background);
 
+      setTimeout(() => {
+        setShowModal(false);
+      }, 1000);
+
       const resp = await createStory(formData);
 
       if (resp.data?.success) {
         fetchStories(); // getting new stories
-        setTimeout(() => {
-          toast.success("Story added", { id: tostId });
-        }, 1000);
-
-        setShowModal(false);
+        toast.success("Story added", { id: tostId });
       }
     } catch (error) {
       toast.error("Failed to add story!", { id: tostId });
+    }
+  };
+
+  const handleMetaData = () => {
+    const video_duration = videoRef?.current.duration;
+    if (video_duration > 20) {
+      toast.error("Video is too long! Max 20s allowed.", { duration: 5000 });
+      setPreviewUrl(null);
+      setMedia(null);
+      setMode("");
     }
   };
   return (
@@ -107,7 +117,14 @@ const StoryModal = ({ setShowModal, fetchStories }) => {
                 className="object-contain max-h-full"
               />
             ) : (
-              <video src={previewUrl} className="object-contain max-h-full" autoPlay controls />
+              <video
+                ref={videoRef}
+                src={previewUrl}
+                onLoadedMetadata={handleMetaData}
+                className="object-contain max-h-full"
+                autoPlay
+                controls
+              />
             ))}
         </div>
 

@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { updatePostLike } from "../store/feedPostsSlice";
 import { deleteUserPost, updateUserPostLike } from "../store/userPostsSlice";
+import PostImgaeViewModal from "./PostImgaeViewModal";
 const PostCard = ({ post, displyOnProfile, isOpen, onToggle }) => {
   const postWithHashtags = post.content?.replace(
     /(#\w+)/g,
@@ -25,7 +26,8 @@ const PostCard = ({ post, displyOnProfile, isOpen, onToggle }) => {
   // postWithHashtags --> This is a sample paragraph with some <span class="text-indigo-600"> #hashtags  </span> like <span class="text-indigo-600"> #socialmedia  </span> and <span class="text-indigo-600"> #marketing  </span>. Let's find them!
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-
+  const [imageModal, setImageModal] = useState(false);
+  const [imageURL, setImageURL] = useState("");
   const currentUser = useSelector((state) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -133,7 +135,11 @@ const PostCard = ({ post, displyOnProfile, isOpen, onToggle }) => {
           <img
             src={imgUrl}
             key={indx}
-            className={`w-full h-48 object-cover rounded-lg ${post.image_urls.length === 1 && "col-span-2 h-auto"}`}
+            className={`w-full h-48 object-cover cursor-pointer rounded-lg ${post.image_urls.length === 1 && "col-span-2 h-auto"}`}
+            onClick={() => {
+              setImageModal(true);
+              setImageURL(imgUrl);
+            }}
           />
         ))}
       </div>
@@ -169,6 +175,8 @@ const PostCard = ({ post, displyOnProfile, isOpen, onToggle }) => {
           onConfirm={handleConfirmRemove}
         />
       )}
+
+      {imageModal && <PostImgaeViewModal imageURL={imageURL} setImageModal={setImageModal} />}
     </div>
   );
 };

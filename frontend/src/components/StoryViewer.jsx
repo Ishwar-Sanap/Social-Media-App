@@ -35,16 +35,21 @@ const StoryViewer = ({ users, initialUserIdx, onClose }) => {
     }
   };
 
-
   useEffect(() => {
     setProgress(0);
     startRef.current = Date.now(); // return timestamp in ms
     clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       const elapsed = Date.now() - startRef.current;
-      const pct = Math.min((elapsed / STORY_DURATION) * 100, 100);
-      setProgress(pct);
-      if (elapsed >= STORY_DURATION) goNext();
+      if (videoRef.current > 0) {
+        const pct = Math.min((elapsed / videoRef.current) * 100, 100);
+        setProgress(pct);
+        if (elapsed >= videoRef.current) goNext();
+      } else {
+        const pct = Math.min((elapsed / STORY_DURATION) * 100, 100);
+        setProgress(pct);
+        if (elapsed >= STORY_DURATION) goNext();
+      }
     }, 60);
     return () => clearInterval(timerRef.current);
   }, [userIdx, storyIdx]);
@@ -63,6 +68,10 @@ const StoryViewer = ({ users, initialUserIdx, onClose }) => {
             src={story.media_url}
             className="h-full w-full object-cover"
             autoPlay
+            ref={videoRef}
+            onLoadedMetadata={(e) =>
+              (videoRef.current = e.currentTarget.duration * 1000)
+            }
           />
         );
       case "text":

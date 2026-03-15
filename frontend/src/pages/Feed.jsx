@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { assets, dummyPostsData } from "../assets/assets";
 import Loading from "../components/Loading";
-import StoriesBar from "../components/StoriesBar";
 import PostCard from "../components/PostCard";
 import RecentMessages from "../components/RecentMessages";
 import { fetchFeedData } from "../api/userPostsService";

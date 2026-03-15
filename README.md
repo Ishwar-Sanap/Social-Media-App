@@ -20,6 +20,8 @@
   - Used axios for making HTTP requests to the backend API, allowing us to fetch and send data between the frontend and backend of application. 
     and used api service layer to centralize and manage all API calls in one place, making it easier to maintain and update the codebase. 
     handled errors on the frontend by catching errors from API calls and displaying appropriate error messages to users.
+  - For manging the user stories, and displaying the media content and ongoing progress bar, using setInterval() method to update the progress bar and manage the timing of story display. 
+    When a user views a story, we start an interval that updates the progress bar until the story duration is complete or the user navigates away from the story. called clearInterval() to stop the interval when the story is no longer being viewed. Used elapsed time to calculate the progress of the story and update the progress bar accordingly.
 
 ## Backend
 
