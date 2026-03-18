@@ -1,10 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { dummyConnectionsData } from "../assets/assets";
 import { Eye, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router";
+import { fetchConnectionsData } from "../api/connectionsService";
 
 const Messages = () => {
   const navigate = useNavigate();
+  const [connectionsData, setConnectinosData] = useState([]);
+
+  useEffect(() => {
+    const getConnectinosData = async () => {
+      try {
+        const resp = await fetchConnectionsData();
+        if (resp.data.success) {
+          setConnectinosData(resp.data?.connections)
+        }
+      } catch (error) {
+        console.log(error.response)
+      }
+    };
+    getConnectinosData();
+  }, []);
   return (
     <div className="h-full overflow-y-scroll no-scrollbar relative bg-slate-100 dark:bg-slate-800">
       <div className="max-w-6xl mx-auto p-6">
@@ -20,7 +36,7 @@ const Messages = () => {
 
         {/* Connected users */}
         <div className="flex flex-col gap-3">
-          {dummyConnectionsData.map((user) => (
+          {connectionsData.map((user) => (
             <div
               key={user._id}
               className="max-w-xl flex flex-wrap gap-5 p-6 bg-white dark:bg-slate-900 shadow-md rounded-lg 

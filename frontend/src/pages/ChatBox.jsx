@@ -2,19 +2,72 @@ import React, { useEffect, useRef, useState } from "react";
 import { dummyMessagesData, dummyUserData } from "../assets/assets";
 import { ImageIcon, SendHorizonal } from "lucide-react";
 import moment from "moment";
+import socket from "../utils/socketConfig.js";
+import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { fetchProfileDetails } from "../api/profileService.js";
+import ErrorComponent from "../components/ErrorComponent.jsx";
+import toast from "react-hot-toast";
+
 const ChatBox = () => {
-  const messages = dummyMessagesData;
+  const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
   const [image, setImage] = useState(null);
-  const [user, setUser] = useState(dummyUserData);
+  const [user, setUser] = useState(null);
   const messagesEndRef = useRef(null);
+  const { userId } = useParams();
+  const loggedInUser = useSelector((state) => state.user);
 
-  const sendMessage = async (params) => {};
+  const roomId = [loggedInUser._id, userId].sort().join("_");
+  const sendMessage = async () => {
+    const messageData = {
+      _id: "6878cc3217a54e4d3747845",
+      from_user_id: loggedInUser._id,
+      to_user_id: userId,
+      text,
+      roomId,
+      message_type: "text",
+      createdAt: new Date(),
+      updatedAt: "2025-07-25T10:43:50.346Z",
+      seen: false,
+    };
+    socket.emit("send_msg", messageData);
+    setMessages((prev) => [...prev, messageData]);
+    setText("");
+    setImage(null);
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  const getUserDetails = async () => {
+    try {
+      const resp = await fetchProfileDetails(userId);
+      if (resp.data?.success) {
+        setUser(resp.data.profile);
+      }
+    } catch (error) {
+      toast.error("Failed to load user details");
+    }
+  };
+  useEffect(() => {
+    getUserDetails();
+    socket.emit("join_room", roomId);
+    socket.on("recv_msg", (newMsg) => setMessages((prev) => [...prev, newMsg]));
+    return () => {
+      socket.off("recv_msg");
+    };
+  }, []);
+
+  if (!user) {
+    return (
+      <ErrorComponent
+        message={"User details not found"}
+        onRetry={getUserDetails}
+      />
+    );
+  }
   return (
     user && (
       <div className="flex flex-col h-screen  bg-slate-100 dark:bg-slate-800 ">
@@ -66,7 +119,9 @@ const ChatBox = () => {
                         className="w-full max-w-sm rounded-lg mb-1"
                       />
                     )}
-                    <p className="text-slate-800 dark:text-slate-100" >{message.text}</p>
+                    <p className="text-slate-800 dark:text-slate-100">
+                      {message.text}
+                    </p>
                   </div>
                 </div>
               ))}
