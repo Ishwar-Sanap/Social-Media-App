@@ -10,10 +10,10 @@ const socketHandler = (io) => {
       clientSocket.join(roomId); // joins the rooms
     });
 
-    clientSocket.on("send_msg", (data) => {
-      //send to message to only user that who joins room 1 : 1 messenging..
-      clientSocket.to(data.roomId).emit("recv_msg", data);
-    });
+    // clientSocket.on("send_msg", (data) => {
+    //   //send message to only user that who joins room 1 : 1 messenging..
+    //   clientSocket.to(data.roomId).emit("recv_msg", data);
+    // });
   });
 };
 

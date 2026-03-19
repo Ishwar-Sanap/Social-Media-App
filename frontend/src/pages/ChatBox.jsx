@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import { dummyMessagesData, dummyUserData } from "../assets/assets";
 import { ImageIcon, SendHorizonal } from "lucide-react";
 import moment from "moment";
 import socket from "../utils/socketConfig.js";
@@ -8,6 +7,7 @@ import { useSelector } from "react-redux";
 import { fetchProfileDetails } from "../api/profileService.js";
 import ErrorComponent from "../components/ErrorComponent.jsx";
 import toast from "react-hot-toast";
+import { fetchChatMessageAPI, sendMessageAPI } from "../api/messagesService.js";
 
 const ChatBox = () => {
   const [messages, setMessages] = useState([]);
@@ -21,18 +21,34 @@ const ChatBox = () => {
   const roomId = [loggedInUser._id, userId].sort().join("_");
   const sendMessage = async () => {
     const messageData = {
-      _id: "6878cc3217a54e4d3747845",
       from_user_id: loggedInUser._id,
       to_user_id: userId,
       text,
       roomId,
-      message_type: "text",
-      createdAt: new Date(),
-      updatedAt: "2025-07-25T10:43:50.346Z",
-      seen: false,
     };
-    socket.emit("send_msg", messageData);
-    setMessages((prev) => [...prev, messageData]);
+
+    try {
+      let resp;
+      if (image) {
+        const formData = new FormData();
+        Object.keys(messageData).forEach((key) => {
+          formData.append(key, messageData[key]);
+        });
+
+        formData.append("image", image);
+        resp = await sendMessageAPI(formData);
+      } else {
+        resp = await sendMessageAPI(messageData);
+      }
+      if (resp.data?.success) {
+        setMessages((prev) => [...prev, resp.data?.message]);
+      } else {
+        toast.error("Failed to send message");
+      }
+    } catch (error) {
+      toast.error("Server is down. Please try later.");
+    }
+
     setText("");
     setImage(null);
   };
@@ -45,18 +61,54 @@ const ChatBox = () => {
     try {
       const resp = await fetchProfileDetails(userId);
       if (resp.data?.success) {
+        if (!loggedInUser.connections.includes(resp.data?.profile?._id)) {
+          toast.error("You are not connected with this user");
+          return false;
+        }
         setUser(resp.data.profile);
+        return true;
       }
+      return false;
     } catch (error) {
       toast.error("Failed to load user details");
+      return false;
+    }
+  };
+
+  const fetchChatMessages = async () => {
+    try {
+      const resp = await fetchChatMessageAPI(userId);
+      if (resp.data?.success) {
+        setMessages(resp.data?.messages);
+      }
+    } catch (error) {
+      console.log(error.message);
     }
   };
   useEffect(() => {
-    getUserDetails();
-    socket.emit("join_room", roomId);
-    socket.on("recv_msg", (newMsg) => setMessages((prev) => [...prev, newMsg]));
+    let isMounted = true;
+
+    const init = async () => {
+      const resp = getUserDetails();
+
+      if (resp && isMounted) {
+        fetchChatMessages();
+
+        socket.emit("join_room", roomId);
+
+        socket.on("recv_msg", (newMsg) => {
+          if (newMsg.from_user_id !== loggedInUser._id)
+            setMessages((prev) => [...prev, newMsg]);
+        });
+      }
+    };
+
+    init();
+
     return () => {
-      socket.off("recv_msg");
+      isMounted = false;
+      socket.off("recv_msg"); // remove the recv_msg listener when component unmounts
+      socket.disconnect();
     };
   }, []);
 

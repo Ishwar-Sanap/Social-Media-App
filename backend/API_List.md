@@ -2,37 +2,42 @@
 
 ## Authentication
 
-- POST /signup
-- POST /login
-- POST /logout
+- POST /signup --> done
+- POST /login  --> done
+- POST /logout --> done
 
 ## Profile Management
 
-- GET /profile/view
-- PATCH /profile/edit
-- GET /profile/discover/?search=keyword
-- POST /profile/follow/:userId
-- POST /profile/unfollow/:userId
-- POST /profile/remove/follower/:userId
-- GET /profile/details/:userId
+- GET /profile/view    --> done 
+- PATCH /profile/edit --> done
+- GET /profile/discover/?search=keyword --> done
+- POST /profile/follow/:userId --> done
+- POST /profile/unfollow/:userId --> done
+- POST /profile/remove/follower/:userId --> done
+- GET /profile/details/:userId --> done
 
 ## Connections
 
-- POST /request/connect/:userId
-- POST /request/accept/:userId
-- POST /request/reject/:userId
-- GET /request/connections
-- POST /request/remove/connection/:userId
+- POST /request/connect/:userId --> done
+- POST /request/accept/:userId --> done
+- POST /request/reject/:userId --> done
+- GET /request/connections --> done
+- POST /request/remove/connection/:userId --> done
 
 ## Posts
 
-- POST /post/create
-- POST /post/delete/:postId
-- POST /post/like/:postId
-- GET /post/feed
+- POST /post/create --> done
+- POST /post/delete/:postId --> done
+- POST /post/like/:postId --> done
+- GET /post/feed --> done
 
 ## Stories
-- POST /story/create
+- POST /story/create --> done
 - POST /story/delete/:storyId
-- GET /story/get
+- GET /story/get --> done
 - POST /story/seen/:storyId
+
+## Messaging
+- POST /message/send --> done
+- GET /message/chats/:userId --> done
+- GET /message/recents --> done

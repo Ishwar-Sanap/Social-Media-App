@@ -32,7 +32,7 @@ const UserCard = ({ user }) => {
 
   const handleSendConnection = async () => {
     if (loggedInUser?.connections.includes(user._id)) {
-      navigate(`/messages/${loggedInUser._id}`);
+      navigate(`/messages/${user._id}`);
       return;
     }
 

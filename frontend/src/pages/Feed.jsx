@@ -40,7 +40,7 @@ const Feed = () => {
     <div className="h-full overflow-y-scroll no-scrollbar py-10 xl:pr-5 flex items-start justify-center xl:gap-8">
       {/* Stories and post list */}
       <div>
-        <StoryFeed/> 
+        <StoryFeed />
         <div className="p-4 space-y-6">
           {feeds.map((post) => (
             <PostCard key={post._id} post={post} />
@@ -49,19 +49,7 @@ const Feed = () => {
       </div>
 
       {/* Right sidebar */}
-      <div className="max-xl:hidden sticky top-0">
-        <div className="max-w-xs bg-white dark:bg-slate-900 text-xs p-4 rounded-md inline-flex flex-col gap-2 shadow">
-          <h3 className="text-slate-800 dark:text-slate-100 font-semibold">
-            Sponsored
-          </h3>
-          <img src={assets.sponsored_img} className="w-75 h-50 rounded-md" />
-          <p className="text-slate-600 dark:text-slate-200"> Email marketing</p>
-          <p className="text-slate-400 dark:text-slate-400">
-            Supercharge your marketing with powerful, easy-to-use platform built
-            for results.
-          </p>
-        </div>
-
+      <div className="max-xl:hidden sticky top-0 w-1/4 flex flex-col justify-end h-[95vh]">
         <RecentMessages />
       </div>
     </div>

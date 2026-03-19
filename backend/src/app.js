@@ -11,6 +11,7 @@ import storyRouter from "./routes/storyRoutes.js";
 import http from "http";
 import { Server } from "socket.io";
 import socketHandler from "./socketHandler.js";
+import messageRouter from "./routes/messageRoutes.js";
 const app = express();
 app.use(
   cors({
@@ -27,6 +28,7 @@ app.use("/profile", userProfileRouter);
 app.use("/request", connectionRouter);
 app.use("/post", postRouter);
 app.use("/story", storyRouter);
+app.use("/message", messageRouter)
 
 const PORT = process.env.PORT || 3000;
 
@@ -40,6 +42,7 @@ const io = new Server(httpServer, {
   },
 });
 
+app.set("io", io);// attaching io to express app to emits the socket events
 socketHandler(io);
 
 httpServer.listen(PORT, () => {

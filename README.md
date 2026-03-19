@@ -11,6 +11,7 @@
   - redux toolkit : For managing the application's states
   - moment : For handling date and time formatting in the application.
   - Axios : For making HTTP requests to the backend API.
+  - socket.io-client : For enabling real-time communication with the backend server using WebSockets, allowing features like real-time messaging and notifications in the application.
 
 - Concepts
   - Taking images as input from user using `<input type="file accept="image/*" />`
@@ -35,6 +36,7 @@
   - validator : For validating and sanitizing user input to prevent security vulnerabilities and ensure data integrity.
   - imageKit : for handling image uploads and storage in the application, providing a convenient way to manage media files.
   - multer : For handling multipart/form-data, which is commonly used for file uploads in web applications.
+  - socket.io : For enabling real-time communication between the server and clients, allowing to implement features like real-time messaging and notifications in the application. 
 
 - Concepts
   - Using ES6 module syntax for importing and exporting modules in the backend code.
