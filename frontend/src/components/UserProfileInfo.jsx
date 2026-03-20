@@ -27,7 +27,7 @@ const UserProfileInfo = ({ user, posts, profileId, setShowEdit }) => {
             </div>
 
             {/* Show edit profile button to logged in user */}
-            {!profileId && (
+            {user._id === profileId && (
               <button
                 onClick={() => setShowEdit(true)}
                 className="absolute top-2 right-5 flex items-center gap-2 border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-gray-700

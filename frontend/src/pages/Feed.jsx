@@ -33,17 +33,7 @@ const Feed = () => {
   };
 
   useEffect(() => {
-    if (socket.connected) {
-      socket.emit("join_user_room", roomId);
-    } else {
-      socket.connect();
-      socket.on("connect", () => socket.emit("join_user_room", roomId)); // when socket is connected then only emits the event
-    }
     getFeedData();
-
-    return () => {
-      socket.off("connect");
-    };
   }, []);
 
   if (error) return <ErrorComponent onRetry={getFeedData} />;

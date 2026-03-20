@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { dummyUserData } from "../assets/assets";
 import { Pencil, X } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { saveProfileDetails } from "../api/profileService";

@@ -16,6 +16,11 @@ const storySchema = new mongoose.Schema(
     },
     views_count: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     background_color: { type: String },
+    expiresAt: {
+      type: Date,
+      required: true,
+      index: { expires: 0 }, // TTL index : TTL = automatic document deletion based on time
+    },
   },
   { timestamps: true, minimize: false },
 );

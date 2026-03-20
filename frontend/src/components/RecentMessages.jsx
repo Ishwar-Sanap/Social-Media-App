@@ -1,39 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router";
 import moment from "moment";
-import { fetchRecentMessagesAPI } from "../api/messagesService";
 import { Minus, Plus } from "lucide-react";
-import socket from "../utils/socketConfig";
 import { useSelector } from "react-redux";
 
 const RecentMessages = () => {
-  const [messagesData, setMessagesData] = useState([]);
-  const [showUnreadMsgs, setShowUnreadMsgs] = useState(true);
-  const loggedInUser = useSelector((state) => state.user);
-  const roomId = "user_" + loggedInUser._id;
-  const fetchRecentMessages = async () => {
-    try {
-      const resp = await fetchRecentMessagesAPI();
-      if (resp.data?.success) {
-        setMessagesData(resp.data?.data);
-      }
-    } catch (error) {}
+  const [showUnreadMsgs, setShowUnreadMsgs] = useState(false);
+  const messagesData = useSelector((state) => state.recentMessages);
+
+  const getTextToDisplay = (message) => {
+    if (message?.text) {
+      if (message.text.length > 25) return message.text.slice(0, 25) + " ...";
+      return message.text;
+    } else {
+      return "Media";
+    }
   };
-
-  useEffect(() => {
-    socket.on("new_msg_notify", (newMsg) => {
-      if (
-        newMsg.from_user_id !== loggedInUser._id
-      )
-        fetchRecentMessages();
-    });
-
-    fetchRecentMessages();
-    return () => {
-      socket.off("new_msg_notify");
-    };
-  }, []);
-
   return (
     <div className="bg-white dark:bg-slate-900 max-w-xs mt-4 p-4 min-h-20 rounded-md shadow text-xs text-slate-800">
       <div className="font-semibold text-slate-800 dark:text-slate-100 mb-4 text-[15px] flex justify-between mx-5">
@@ -75,9 +57,7 @@ const RecentMessages = () => {
 
                 <div className="flex justify-between">
                   <p className="text-gray-600 dark:text-slate-400">
-                    {data.last_unread_msg?.text
-                      ? data.last_unread_msg?.text
-                      : "Media"}
+                    {getTextToDisplay(data.last_unread_msg)}
                   </p>
 
                   {!data.last_unread_msg?.seen && (

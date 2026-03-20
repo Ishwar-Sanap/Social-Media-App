@@ -4,12 +4,14 @@ import { uploadImageOnImageKit } from "../utils/uploadOnImageKit.js";
 export const sendMessage = async (req, res) => {
   try {
     const loggedInUser = req.user;
-    const { to_user_id, text, roomId } = req.body;
+    const { to_user_id, text, roomId, from_user } = req.body;
     const image = req.file;
 
     let media_url = "";
+    let from_user_obj = from_user;
     let message_type = image ? "image" : "text";
     if (message_type === "image") {
+      from_user_obj = JSON.parse(from_user);
       media_url = await uploadImageOnImageKit(image, "Messages_Media", 1280);
     }
 
@@ -25,7 +27,10 @@ export const sendMessage = async (req, res) => {
 
     //send notification
     const userRoomId = "user_" + to_user_id;
-    io.to(userRoomId).emit("new_msg_notify", message);
+    io.to(userRoomId).emit("new_msg_notify", {
+      ...message.toObject(),
+      from_user : from_user_obj,
+    });
 
     //Sending message to to_user_id using socket.io
     //emit message to user via socket
@@ -112,7 +117,5 @@ export const markMessageAsSeen = async (msgData) => {
       { seen: true },
       { returnDocument: "after" },
     );
-  } catch (error) {
-
-  }
+  } catch (error) {}
 };

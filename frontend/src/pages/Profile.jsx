@@ -73,7 +73,7 @@ const Profile = () => {
           <UserProfileInfo
             user={user}
             posts={posts}
-            profileId={profileId}
+            profileId={loggedInUser._id}
             setShowEdit={setShowEdit}
           />
         </div>

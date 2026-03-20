@@ -3,11 +3,12 @@ import { ImageIcon, SendHorizonal } from "lucide-react";
 import moment from "moment";
 import socket from "../utils/socketConfig.js";
 import { useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchProfileDetails } from "../api/profileService.js";
 import ErrorComponent from "../components/ErrorComponent.jsx";
 import toast from "react-hot-toast";
 import { fetchChatMessageAPI, sendMessageAPI } from "../api/messagesService.js";
+import { removeRecentMessages } from "../store/recentMessagesSlice.js";
 
 const ChatBox = () => {
   const [messages, setMessages] = useState([]);
@@ -17,12 +18,16 @@ const ChatBox = () => {
   const messagesEndRef = useRef(null);
   const { userId } = useParams();
   const loggedInUser = useSelector((state) => state.user);
-
+  const dispatch = useDispatch();
   const roomId = [loggedInUser._id, userId].sort().join("_");
-  
+
   const sendMessage = async () => {
     const messageData = {
       from_user_id: loggedInUser._id,
+      from_user: {
+        full_name: loggedInUser.full_name,
+        profile_picture: loggedInUser.profile_picture,
+      },
       to_user_id: userId,
       text,
       roomId,
@@ -33,12 +38,26 @@ const ChatBox = () => {
       if (image) {
         const formData = new FormData();
         Object.keys(messageData).forEach((key) => {
-          formData.append(key, messageData[key]);
+          if (key === "from_user") {
+            formData.append(
+              key,
+              JSON.stringify({
+                full_name: loggedInUser.full_name,
+                profile_picture: loggedInUser.profile_picture,
+              }),
+            );
+          } else {
+            formData.append(key, messageData[key]);
+          }
         });
 
         formData.append("image", image);
         resp = await sendMessageAPI(formData);
       } else {
+        if (text.length === 0) {
+          toast.error("Please write something");
+          return;
+        }
         resp = await sendMessageAPI(messageData);
       }
       if (resp.data?.success) {
@@ -81,6 +100,7 @@ const ChatBox = () => {
       const resp = await fetchChatMessageAPI(userId);
       if (resp.data?.success) {
         setMessages(resp.data?.messages);
+        dispatch(removeRecentMessages(userId)); //all messages are red
       }
     } catch (error) {
       console.log(error.message);
@@ -95,12 +115,7 @@ const ChatBox = () => {
 
       if (resp && isMounted) {
         fetchChatMessages();
-        if (socket.connected) {
-          socket.emit("join_chat_room", roomId);
-        } else {
-          socket.connect();
-          socket.on("connect", () => socket.emit("join_chat_room", roomId)); // when socket is connected then only emits the event
-        }
+        socket.emit("join_chat_room", roomId);
         socket.on("recv_msg", (newMsg) => {
           if (newMsg.from_user_id !== loggedInUser._id) {
             setMessages((prev) => [...prev, newMsg]);
@@ -115,9 +130,7 @@ const ChatBox = () => {
     return () => {
       isMounted = false;
       socket.off("recv_msg"); // remove the recv_msg listener when component unmounts
-      socket.off("connect");
       socket.emit("leave_chat_room", roomId);
-      socket.disconnect();
     };
   }, []);
 

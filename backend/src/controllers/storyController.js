@@ -20,6 +20,7 @@ export const addUserStory = async (req, res) => {
       media_type,
       media_url,
       background_color,
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
     });
 
     res.json({ success: true, message: "Story created successfully" });
@@ -36,10 +37,14 @@ export const getStories = async (req, res) => {
     const userIds = [
       loggedInUser._id,
       ...loggedInUser.connections,
-      ...loggedInUser.followers,
+      ...loggedInUser.following,
     ];
 
-    const stories = await Story.find({ user: { $in: userIds } })
+    const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const stories = await Story.find({
+      user: { $in: userIds },
+      expiresAt: { $gt: new Date() },
+    })
       .populate("user", selectedUserDetails)
       .sort({ createdAt: -1 }); // sort in descending order of createdAt (newest story first)
 
@@ -95,5 +100,3 @@ export const viewStory = async (req, res) => {
     res.status(400).json({ success: false, message: error.message });
   }
 };
-
-//TO-DO : Deleting the user Story after 24hrs
