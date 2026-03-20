@@ -3,10 +3,14 @@ import { Link } from "react-router";
 import moment from "moment";
 import { fetchRecentMessagesAPI } from "../api/messagesService";
 import { Minus, Plus } from "lucide-react";
+import socket from "../utils/socketConfig";
+import { useSelector } from "react-redux";
 
 const RecentMessages = () => {
   const [messagesData, setMessagesData] = useState([]);
   const [showUnreadMsgs, setShowUnreadMsgs] = useState(true);
+  const loggedInUser = useSelector((state) => state.user);
+  const roomId = "user_" + loggedInUser._id;
   const fetchRecentMessages = async () => {
     try {
       const resp = await fetchRecentMessagesAPI();
@@ -17,7 +21,17 @@ const RecentMessages = () => {
   };
 
   useEffect(() => {
+    socket.on("new_msg_notify", (newMsg) => {
+      if (
+        newMsg.from_user_id !== loggedInUser._id
+      )
+        fetchRecentMessages();
+    });
+
     fetchRecentMessages();
+    return () => {
+      socket.off("new_msg_notify");
+    };
   }, []);
 
   return (

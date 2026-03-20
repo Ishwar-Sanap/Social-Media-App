@@ -1,19 +1,26 @@
+import { markMessageAsSeen } from "./controllers/messageController.js";
+
 const socketHandler = (io) => {
   io.on("connection", (clientSocket) => {
     // console.log("Client connected : ", clientSocket.id);
 
+    clientSocket.on("join_user_room", (userRoomId) => {
+      clientSocket.join(userRoomId);
+    });
+    clientSocket.on("join_chat_room", (chatRoomId) => {
+      clientSocket.join(chatRoomId); // joins the rooms
+    });
+
+    clientSocket.on("leave_chat_room", (chatRoomId) => {
+      clientSocket.leave(chatRoomId);
+    });
+
+    clientSocket.on("msg_seen", (msgData)=>{
+      markMessageAsSeen(msgData);
+    })
     clientSocket.on("disconnect", () => {
-    //   console.log("Client disconnnected : ", clientSocket.id);
+      // automatically removes from all the rooms.
     });
-
-    clientSocket.on("join_room", (roomId) => {
-      clientSocket.join(roomId); // joins the rooms
-    });
-
-    // clientSocket.on("send_msg", (data) => {
-    //   //send message to only user that who joins room 1 : 1 messenging..
-    //   clientSocket.to(data.roomId).emit("recv_msg", data);
-    // });
   });
 };
 

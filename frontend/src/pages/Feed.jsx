@@ -8,13 +8,15 @@ import ErrorComponent from "../components/ErrorComponent";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "../store/feedPostsSlice";
 import StoryFeed from "../components/StoryFeed";
+import socket from "../utils/socketConfig";
 
 const Feed = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const dispatch = useDispatch();
   const feeds = useSelector((state) => state.feedPosts.posts);
-
+  const loggedInUser = useSelector((state) => state.user);
+  const roomId = "user_" + loggedInUser._id;
   const getFeedData = async () => {
     setError(false);
     setLoading(true);
@@ -31,7 +33,17 @@ const Feed = () => {
   };
 
   useEffect(() => {
+    if (socket.connected) {
+      socket.emit("join_user_room", roomId);
+    } else {
+      socket.connect();
+      socket.on("connect", () => socket.emit("join_user_room", roomId)); // when socket is connected then only emits the event
+    }
     getFeedData();
+
+    return () => {
+      socket.off("connect");
+    };
   }, []);
 
   if (error) return <ErrorComponent onRetry={getFeedData} />;

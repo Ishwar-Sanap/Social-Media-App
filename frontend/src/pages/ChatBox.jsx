@@ -19,6 +19,7 @@ const ChatBox = () => {
   const loggedInUser = useSelector((state) => state.user);
 
   const roomId = [loggedInUser._id, userId].sort().join("_");
+  
   const sendMessage = async () => {
     const messageData = {
       from_user_id: loggedInUser._id,
@@ -85,6 +86,7 @@ const ChatBox = () => {
       console.log(error.message);
     }
   };
+
   useEffect(() => {
     let isMounted = true;
 
@@ -93,12 +95,17 @@ const ChatBox = () => {
 
       if (resp && isMounted) {
         fetchChatMessages();
-
-        socket.emit("join_room", roomId);
-
+        if (socket.connected) {
+          socket.emit("join_chat_room", roomId);
+        } else {
+          socket.connect();
+          socket.on("connect", () => socket.emit("join_chat_room", roomId)); // when socket is connected then only emits the event
+        }
         socket.on("recv_msg", (newMsg) => {
-          if (newMsg.from_user_id !== loggedInUser._id)
+          if (newMsg.from_user_id !== loggedInUser._id) {
             setMessages((prev) => [...prev, newMsg]);
+            socket.emit("msg_seen", newMsg);
+          }
         });
       }
     };
@@ -108,6 +115,8 @@ const ChatBox = () => {
     return () => {
       isMounted = false;
       socket.off("recv_msg"); // remove the recv_msg listener when component unmounts
+      socket.off("connect");
+      socket.emit("leave_chat_room", roomId);
       socket.disconnect();
     };
   }, []);

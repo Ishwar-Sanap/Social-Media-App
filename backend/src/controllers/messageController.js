@@ -22,6 +22,11 @@ export const sendMessage = async (req, res) => {
     });
 
     const io = req.app.get("io");
+
+    //send notification
+    const userRoomId = "user_" + to_user_id;
+    io.to(userRoomId).emit("new_msg_notify", message);
+
     //Sending message to to_user_id using socket.io
     //emit message to user via socket
     io.to(roomId).emit("recv_msg", message);
@@ -95,5 +100,19 @@ export const getUserRecentMessages = async (req, res) => {
     res.json({ success: true, data });
   } catch (error) {
     res.status(400).json({ status: false, message: error.message });
+  }
+};
+
+//This function will be called when msg_seen evet is emitted.
+export const markMessageAsSeen = async (msgData) => {
+  try {
+    const msgId = msgData._id;
+    const resp = await Message.findByIdAndUpdate(
+      msgId,
+      { seen: true },
+      { returnDocument: "after" },
+    );
+  } catch (error) {
+
   }
 };
