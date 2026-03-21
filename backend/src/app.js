@@ -15,7 +15,7 @@ import messageRouter from "./routes/messageRoutes.js";
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL,
     credentials: true,
   }),
 );
@@ -28,7 +28,7 @@ app.use("/profile", userProfileRouter);
 app.use("/request", connectionRouter);
 app.use("/post", postRouter);
 app.use("/story", storyRouter);
-app.use("/message", messageRouter)
+app.use("/message", messageRouter);
 
 const PORT = process.env.PORT || 3000;
 
@@ -37,12 +37,12 @@ const httpServer = http.createServer(app);
 // Initialize Socket.io
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL,
     methods: ["GET", "POST"],
   },
 });
 
-app.set("io", io);// attaching io to express app to emits the socket events
+app.set("io", io); // attaching io to express app to emits the socket events
 socketHandler(io);
 
 httpServer.listen(PORT, () => {

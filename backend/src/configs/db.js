@@ -5,9 +5,11 @@ const connectDB = async () => {
     mongoose.connection.on("connected", () =>
       console.log("Database connected"),
     );
-    await mongoose.connect(process.env.MONGODB_URL + "/SocialMediaDB");
+    await mongoose.connect(process.env.MONGODB_URL_ATLAS, {
+      dbName: "SocialMediaDB"
+    });
   } catch (error) {
-    console.log( "Failed to connect database : ",error.message);
+    console.log("Failed to connect database : ", error.message);
   }
 };
 

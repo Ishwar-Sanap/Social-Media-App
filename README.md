@@ -50,5 +50,5 @@
   - Scheduling background tasks using node-cron to perform periodic operations such as sending notifications, deleting old user stories data , or performing maintenance tasks at specified intervals.
   - used seperate rooms for each user to manage real-time communication effectively.
     When a user connects to the server, they join a room with their unique user ID. This allows us to send targeted messages and notifications to specific users based on their room membership, ensuring that only relevant information is delivered to each user.
-- Deleting the stories after 24hrs using MongoDB's TTL (Time To Live) index feature. We set an expiration time of 24 hours on the story documents, and MongoDB automatically    
-  deletes the documents once they reach their expiration time, ensuring that old stories are removed from the database without manual intervention.
+  - Deleting the stories after 24hrs using MongoDB's TTL (Time To Live) index feature. We set an expiration time of 24 hours on the story documents, and MongoDB automatically    
+    deletes the documents once they reach their expiration time, ensuring that old stories are removed from the database without manual intervention.
