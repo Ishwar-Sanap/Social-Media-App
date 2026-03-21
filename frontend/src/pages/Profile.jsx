@@ -81,7 +81,7 @@ const Profile = () => {
         {/* Tabs */}
         <div className="mt-6 mb-6 ">
           <div className="bg-white dark:bg-slate-900  rounded-xl shadow-lg p-1 flex max-w-md mx-auto">
-            {["posts", "media", "likes"].map((tab) => (
+            {["posts", "media"].map((tab) => (
               <button
                 onClick={() => setActiveTab(tab)}
                 key={tab}

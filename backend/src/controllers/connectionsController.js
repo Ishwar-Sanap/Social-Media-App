@@ -72,9 +72,10 @@ export const sendConnectionRequest = async (req, res) => {
 export const getUserConnections = async (req, res) => {
   try {
     const loggedInUser = req.user;
-
+    const selectedUserDetails = "full_name username profile_picture bio";
     const user = await User.findById(loggedInUser._id).populate(
       "connections followers following",
+      selectedUserDetails,
     );
 
     const connections = user.connections;
@@ -85,7 +86,9 @@ export const getUserConnections = async (req, res) => {
     const userConnections = await Connection.find({
       to_user_id: loggedInUser._id,
       status: "pending",
-    }).populate("from_user_id").sort({createdAt : -1});
+    })
+      .populate("from_user_id", selectedUserDetails)
+      .sort({ createdAt: -1 });
 
     const pendingConnections = userConnections.map(
       (connection) => connection.from_user_id,

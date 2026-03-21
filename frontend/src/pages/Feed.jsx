@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { assets, dummyPostsData } from "../assets/assets";
 import Loading from "../components/Loading";
 import PostCard from "../components/PostCard";
 import RecentMessages from "../components/RecentMessages";
@@ -8,15 +7,12 @@ import ErrorComponent from "../components/ErrorComponent";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "../store/feedPostsSlice";
 import StoryFeed from "../components/StoryFeed";
-import socket from "../utils/socketConfig";
 
 const Feed = () => {
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState(null);
   const dispatch = useDispatch();
   const feeds = useSelector((state) => state.feedPosts.posts);
-  const loggedInUser = useSelector((state) => state.user);
-  const roomId = "user_" + loggedInUser._id;
   const getFeedData = async () => {
     setError(false);
     setLoading(true);
@@ -27,7 +23,7 @@ const Feed = () => {
     } catch (error) {
       setTimeout(() => {
         setLoading(false);
-        setError(true);
+        setError(error);
       }, 1000);
     }
   };
@@ -36,7 +32,7 @@ const Feed = () => {
     getFeedData();
   }, []);
 
-  if (error) return <ErrorComponent onRetry={getFeedData} />;
+  if (error) return <ErrorComponent message={error?.response?.data?.message} onRetry={getFeedData} />;
 
   return !loading ? (
     <div className="h-full overflow-y-scroll no-scrollbar py-10 xl:pr-5 flex items-start justify-center xl:gap-8">

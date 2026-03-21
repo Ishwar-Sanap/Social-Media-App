@@ -40,7 +40,7 @@ export const createPost = async (req, res) => {
 export const getFeedPosts = async (req, res) => {
   try {
     const loggedInUser = req.user;
-
+    const selectedUserDetails = "full_name username profile_picture";
     //In feed user can see only post from loggedInuser,  connected  or following users
     const userIds = [
       loggedInUser._id,
@@ -49,10 +49,13 @@ export const getFeedPosts = async (req, res) => {
     ];
 
     const posts = await Post.find({ user: { $in: userIds } })
-      .populate("user")
+      .populate("user", selectedUserDetails)
       .sort({ createdAt: -1 }); // sort in descending order of createdAt (newest post first)
 
-    if (posts.length === 0) throw new Error("No posts found");
+    if (posts.length === 0)
+      throw new Error(
+        "No posts found, connect or follow users to see content",
+      );
 
     res.json({ success: true, posts });
   } catch (error) {

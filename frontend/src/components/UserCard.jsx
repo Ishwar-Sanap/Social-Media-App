@@ -82,7 +82,10 @@ const UserCard = ({ user }) => {
       {/* Location and followers */}
       <div className="flex justify-center items-center gap-2 mt-4 text-xs text-gray-600 dark:text-slate-400">
         <div className="flex items-center gap-1 border border-gray-300 rounded-full px-3 py-1">
-          <MapPin className="w-4 h-4" /> {user.location}
+          <MapPin className="w-4 h-4" />{" "}
+          {user.location.length > 15
+            ? user.location.slice(0, 15) + "..."
+            : user.location}
         </div>
         <div className="flex items-center gap-1 border border-gray-300 rounded-full px-3 py-1">
           <span>{user.followers.length}</span> Followers

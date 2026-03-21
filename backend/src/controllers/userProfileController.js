@@ -1,12 +1,12 @@
 import Post from "../models/Post.js";
 import User from "../models/User.js";
 import { validateEditRequestData } from "../utils/dataValidations.js";
-import {uploadImageOnImageKit} from "../utils/uploadOnImageKit.js";
+import { uploadImageOnImageKit } from "../utils/uploadOnImageKit.js";
 export const getUserProfile = async (req, res) => {
   try {
     const loggedInUser = req.user;
-
-    res.json({ success: true, user: loggedInUser });
+    const { email, password, ...selectedFields } = loggedInUser.toObject();
+    res.json({ success: true, user: selectedFields });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }
@@ -15,10 +15,11 @@ export const getUserProfile = async (req, res) => {
 export const getProfileDetails = async (req, res) => {
   try {
     const { userId } = req.params;
-    const userProfile = await User.findById(userId);
+    const userProfile = await User.findById(userId).select("-email -password");
     if (!userProfile) throw new Error("User not found");
-
-    const posts = await Post.find({ user: userProfile._id }).sort({ createdAt: -1 });;
+    const posts = await Post.find({ user: userProfile._id }).sort({
+      createdAt: -1,
+    });
     res.json({ success: true, profile: userProfile, posts });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
@@ -59,8 +60,12 @@ export const editUserProfile = async (req, res) => {
 
     //save updated user into DB
     const user = await loggedInUser.save();
-
-    res.json({ success: true, user, message: "Profile updated successfully" });
+    const { email, password, ...selectedFields } = user.toObject();
+    res.json({
+      success: true,
+      user: selectedFields,
+      message: "Profile updated successfully",
+    });
   } catch (error) {
     if (error.name === "MongoServerError" && error.code === 11000) {
       const field = Object.keys(error.keyValue)[0];
@@ -77,6 +82,8 @@ export const discoverUsersProfile = async (req, res) => {
     const loggedInUser = req.user;
     const { search } = req.query;
     const searchRegex = new RegExp(search, "i"); // case Insensitive seraching for search text that can appears anywhere in [username, full_name, or location]
+    const selectedUserDetails =
+      "full_name username profile_picture location followers";
     const allUsers = await User.find({
       $and: [
         {
@@ -88,7 +95,7 @@ export const discoverUsersProfile = async (req, res) => {
         },
         { _id: { $ne: loggedInUser._id } },
       ],
-    });
+    }).select(selectedUserDetails);
     const message = `Number of users found ${allUsers.length}`;
     res.json({ success: true, data: allUsers, message });
   } catch (error) {
@@ -166,7 +173,6 @@ export const removeFollower = async (req, res) => {
 
     if (!loggedInUser.followers.includes(userId))
       throw new Error("This User is not your follower");
-
 
     loggedInUser.followers = loggedInUser.followers.filter(
       (uid) => uid.toString() !== userId,

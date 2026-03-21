@@ -9,18 +9,19 @@ import {
 export const signupUser = async (req, res) => {
   try {
     validateSignupData(req.body);
-    const { full_name, username, email, password } = req.body;
-    const hashPassword = await bcrypt.hash(password, 10);
+    const { full_name, username } = req.body;
+    const hashPassword = await bcrypt.hash(req.body?.password, 10);
     const user = await User.create({
       full_name,
       username,
-      email,
+      email: req.body?.email,
       password: hashPassword,
     });
     //sending the JWT Token through cookies after succesfully sign up
     const jwtToken = user.getJWT();
     res.cookie("token", jwtToken);
-    res.json({ success: true, user });
+    const { email, password, ...selectedFields } = user.toObject();
+    res.json({ success: true, user: selectedFields });
   } catch (error) {
     if (error.name === "MongoServerError" && error.code === 11000) {
       const field = Object.keys(error.keyValue)[0];
@@ -34,17 +35,17 @@ export const signupUser = async (req, res) => {
 
 export const loginUser = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
-    const user = await User.findOne({ $or: [{ email }, { username }] });
+    const { username, email:userEmail, password: userEnterPassword } = req.body;
+    const user = await User.findOne({ $or: [{ email:userEmail }, { username }] });
     if (!user) throw new Error("Invalid credentials");
-    const isValidPassword = await validatePassword(password, user.password);
+    const isValidPassword = await validatePassword(userEnterPassword, user.password);
     if (!isValidPassword) throw new Error("Invalid credentials");
 
     //sending the JWT Token through cookies after succesfully logged in
     const jwtToken = user.getJWT();
     res.cookie("token", jwtToken);
-
-    res.json({ success: true, user });
+    const { email, password, ...selectedFields } = user.toObject();
+    res.json({ success: true, user: selectedFields });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }

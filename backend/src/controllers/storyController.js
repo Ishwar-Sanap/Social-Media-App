@@ -83,8 +83,8 @@ export const viewStory = async (req, res) => {
   try {
     const loggedInUser = req.user;
     const { storyId } = req.params;
-
-    const story = await Story.findById(storyId).populate("user");
+    const selectedUserDetails = "full_name username profile_picture";
+    const story = await Story.findById(storyId).populate("user", selectedUserDetails);
     if (!story) throw new Error("No story found");
 
     if (

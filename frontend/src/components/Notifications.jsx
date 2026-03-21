@@ -4,7 +4,6 @@ import toast from "react-hot-toast";
 
 const Notifications = ({ t, message }) => {
   const navigate = useNavigate();
-  console.log(message);
 
   const getTextToDisplay = () => {
     if (message?.text) {
@@ -17,7 +16,7 @@ const Notifications = ({ t, message }) => {
   return (
     <div
       className={
-        "max-w-sm w-full bg-white dark:bg-slate-900 shadow-lg rounded-1g flex border border-gray-300 dark:border-gray-700 hover:scale-105 transition"
+        "max-w-sm w-full bg-white dark:bg-slate-900 shadow-lg rounded-lg flex border border-gray-300 dark:border-gray-700 hover:scale-105 transition"
       }
     >
       <div className="flex-1 p-4">

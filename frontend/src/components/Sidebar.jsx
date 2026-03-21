@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { assets, dummyUserData } from "../assets/assets";
+import { assets } from "../assets/assets";
 import { Link, useNavigate } from "react-router";
 import MenuItems from "./MenuItems";
 import { CirclePlus, LogOut, Moon, Sun } from "lucide-react";
@@ -36,7 +36,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
       <div className="w-full">
         <img
           src={assets.logo}
-          className="w-26 ml-7 my-2 cursor-pointer"
+          className="w-45 ml-7 my-2 cursor-pointer"
           onClick={() => navigate("/")}
         />
         <hr className="border-gray-300 dark:border-gray-700 mb-8" />
