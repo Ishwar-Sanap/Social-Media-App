@@ -4,6 +4,7 @@ import {
   validatePassword,
   validateSignupData,
 } from "../utils/dataValidations.js";
+import authCookieOptions from "../configs/authCookieOptions.js";
 
 //sign-up new user to platform
 export const signupUser = async (req, res) => {
@@ -19,7 +20,7 @@ export const signupUser = async (req, res) => {
     });
     //sending the JWT Token through cookies after succesfully sign up
     const jwtToken = user.getJWT();
-    res.cookie("token", jwtToken, { secure: true,sameSite: "none" });
+    res.cookie("token", jwtToken, authCookieOptions);
     const { email, password, ...selectedFields } = user.toObject();
     res.json({ success: true, user: selectedFields });
   } catch (error) {
@@ -43,7 +44,7 @@ export const loginUser = async (req, res) => {
 
     //sending the JWT Token through cookies after succesfully logged in
     const jwtToken = user.getJWT();
-    res.cookie("token", jwtToken);
+    res.cookie("token", jwtToken, authCookieOptions);
     const { email, password, ...selectedFields } = user.toObject();
     res.json({ success: true, user: selectedFields });
   } catch (error) {
@@ -54,7 +55,7 @@ export const loginUser = async (req, res) => {
 export const logOutUser = async (req, res) => {
   try {
     //clear the cookies, tokens and send success..
-    res.cookie("token", null, { expires: new Date(Date.now()) });
+    res.clearCookie("token",  authCookieOptions);
     res.json({ success: true, message: "logout successfully" });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
