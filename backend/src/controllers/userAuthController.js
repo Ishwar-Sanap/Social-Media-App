@@ -19,7 +19,7 @@ export const signupUser = async (req, res) => {
     });
     //sending the JWT Token through cookies after succesfully sign up
     const jwtToken = user.getJWT();
-    res.cookie("token", jwtToken);
+    res.cookie("token", jwtToken, { secure: true,sameSite: "none" });
     const { email, password, ...selectedFields } = user.toObject();
     res.json({ success: true, user: selectedFields });
   } catch (error) {
